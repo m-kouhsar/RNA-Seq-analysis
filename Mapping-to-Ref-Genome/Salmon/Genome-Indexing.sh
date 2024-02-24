@@ -20,10 +20,14 @@ if [ ! -f $Decoy_file ]
 then
 	grep "^>" <(gunzip -c $Genome_fasta) | cut -d " " -f 1 > $Decoy_file
 	sed -i.bak -e 's/>//g' $Decoy_file
+fi
+
+if [ ! -f ${OutDir}/genome_transcripts.fa.gz ]
+then
 	cat $Transcript_fasta $Genome_fasta > ${OutDir}/genome_transcripts.fa.gz
 fi
 
-salmon index -t $Genome_fasta  \
+salmon index -t ${OutDir}/genome_transcripts.fa.gz  \
 	-i $OutDir \
 	--decoys $Decoy_file \
   	-p 16 \
