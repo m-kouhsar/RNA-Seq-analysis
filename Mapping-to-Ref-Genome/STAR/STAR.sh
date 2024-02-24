@@ -18,6 +18,7 @@ GenomeIndexDir=./GenomeIndex
 
 module load STAR
 mkdir -p $OutDir
+mkdir -p ${OutDir}/temp
 
 for i in ${InDir}/*R1*.fastq.gz
 do
