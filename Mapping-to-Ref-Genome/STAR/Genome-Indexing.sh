@@ -10,9 +10,9 @@
 
 ######################################################################################################################
 
-OutDir=/lustre/projects/Research_Project-191391/STAR/references/genome_index37
-Genome_fasta=/lustre/projects/Research_Project-191391/STAR/references/genome_fasta/GRCh37.p13.genome.fa
-Genome_annotation=/lustre/projects/Research_Project-191391/STAR/references/genome_anno/gencode.v19.annotation.gff3
+OutDir=./genome_index
+Genome_fasta=./references/GRCh37.p13.genome.fa
+Genome_annotation=./references/gencode.v19.annotation.gff3
 
 ######################################################################################################################
 
