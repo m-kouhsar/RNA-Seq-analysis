@@ -9,9 +9,9 @@
 #SBATCH --mail-type=END # send email at job completion 
 #SBATCH --mail-user=m.kouhsar@exeter.ac.uk # email address 
 
-RefDir=/lustre/projects/Research_Project-191391/ref
+RefDir=./ref
 OutDir=${RefDir}/gencode.v38.transcripts_index
-RawDir=/lustre/projects/Research_Project-191391/Project_10396/11_fastp_trimmed
+RawDir=./RNASeq_fastq
 
 module load Salmon
 
