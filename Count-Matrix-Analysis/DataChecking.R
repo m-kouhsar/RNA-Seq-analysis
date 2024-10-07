@@ -4,13 +4,13 @@ library(DESeq2)
 library(WGCNA)
 library(stringr)
 
-setwd("C:/Users/mk693/OneDrive - University of Exeter/Desktop/2021/NIH/Data/miRNA-Seq/Sep2024")
-counts.file <- "Raw/Project.11008.PITT.miRNA.AD.C.Psy2.Count.txt"
-pheno.file <- "Raw/Project.11008.PITT.miRNA.AD.C.Psy2.Pheno.csv"
+setwd("./")
+counts.file <- "Raw/Count.txt"
+pheno.file <- "Raw/Pheno.csv"
 var.trait <- "Trait"
-var.fact <- "Sex,Plate,BraakStage"
+var.fact <- "Sex,Plate"
 var.num <- "Age,RIN"
-OutPrefix <- "Results/Project.11008.PITT.miRNA.AD.C.Psy2"
+OutPrefix <- "Results/Project01"
 
 ########################################################################
 #
