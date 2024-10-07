@@ -125,6 +125,6 @@ for (var_ in c(var.trait , var.fact , var.num)) {
 graphics.off()
 
 #################################################
-#clusters = cbind.data.frame(sample = rownames(pheno),cluster = cutree(hc , k = 3))
+
 
 
