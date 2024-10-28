@@ -28,20 +28,20 @@ DEG.DESeq2 <- function(count.data , phenotype.data , trait , batches, p.adjust.m
 #
 ########################################################################
 
-setwd("./")
-counts.file <- "Raw/Count.txt"
-pheno.file <- "Raw/Pheno.csv"
+setwd("C:/Users/mk693/OneDrive - University of Exeter/Desktop/2021/NIH/Data/miRNA-Seq/Sep2024")
+counts.file <- "Raw/BDR.miRNA.AD.C.Psy2.Count.txt"
+pheno.file <- "Raw/BDR.miRNA.AD.C.Psy2.Pheno.csv"
 var.trait <- "Trait"
 var.batch.num <- "Age,RIN"
 var.batch.fact <- "Sex,Plate"
-outliers = "Sample1,Sample2"
-logFC = 1
+outliers = "BBN10205"
+logFC = round(log2(1.2) , digits = 2)
 Pvalue = 0.05
 P.adjust = 0.05
 p.adjust.method = "bonferroni"
-runSVA = T
-n.SV = 3
-OutPrefix <- "Results/Project01"
+runSVA = F
+n.SV = 4
+OutPrefix <- "Results/BDR/BDR.miRNA.AD.C.Psy2.DESeq2"
 
 ########################################################################
 #
@@ -66,23 +66,9 @@ if(!identical(colnames(counts) , rownames(pheno))){
   }
 }
 
-for (var_ in var.batch.fact) {
-  pheno[,var_] <- as.factor(pheno[,var_])
-}
-
 for (var_ in var.batch.num) {
   pheno[,var_] <- as.numeric(pheno[,var_])
 }
-
-########################################################################
-#
-#          Filtering low counts
-#
-########################################################################
-message("Filtering low count genes...")
-keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 10)
-message(sum(keep), " genes remained.")
-counts <- counts[keep,]
 
 ########################################################################
 #
@@ -101,6 +87,20 @@ if(all(outliers != "")){
   
   paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
 }
+
+for (var_ in var.batch.fact) {
+  pheno[,var_] <- as.factor(pheno[,var_])
+}
+
+########################################################################
+#
+#          Filtering low counts
+#
+########################################################################
+message("Filtering low count genes...")
+keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 10)
+message(sum(keep), " genes remained.")
+counts <- counts[keep,]
 
 ########################################################################
 #
@@ -147,43 +147,3 @@ for (i in 1:nrow(contrasts_)){
   write.csv(result.filter , file = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
                                    ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust,".csv"))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
