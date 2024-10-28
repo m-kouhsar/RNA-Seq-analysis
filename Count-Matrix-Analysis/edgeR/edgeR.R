@@ -10,19 +10,20 @@ set.seed(12345)
 #
 ########################################################################
 
-counts.file <- "./Count.txt"
-pheno.file <- "./Pheno.csv"
+setwd("C:/Users/mk693/OneDrive - University of Exeter/Desktop/2021/NIH/Data/miRNA-Seq/Sep2024")
+counts.file <- "Raw/BDR.miRNA.AD.C.Psy2.Count.txt"
+pheno.file <- "Raw/BDR.miRNA.AD.C.Psy2.Pheno.csv"
 var.trait <- "Trait"
 var.batch.num <- "Age,RIN"
 var.batch.fact <- "Sex,Plate"
-outliers = "Sample1"
-logFC = 2
-Pvalue = 1e-3
+outliers = "BBN10205"
+logFC = round(log2(1.2) , digits = 2)
+Pvalue = 0.05
 P.adjust = 0.05
 p.adjust.method = "bonferroni"
 runSVA = T
 n.SV = 3
-OutPrefix <- "./DEG.Out"
+OutPrefix <- "Results/BDR/BDR.miRNA.AD.C.Psy2.edgeR"
 
 ########################################################################
 #
@@ -47,23 +48,9 @@ if(!identical(colnames(counts) , rownames(pheno))){
   }
 }
 
-for (var_ in var.batch.fact) {
-  pheno[,var_] <- as.factor(pheno[,var_])
-}
-
 for (var_ in var.batch.num) {
   pheno[,var_] <- as.numeric(pheno[,var_])
 }
-
-########################################################################
-#
-#          Filtering low counts
-#
-########################################################################
-message("Filtering low count genes...")
-keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 10)
-message(sum(keep), " genes remained.")
-counts <- counts[keep,]
 
 ########################################################################
 #
@@ -82,6 +69,20 @@ if(all(outliers != "")){
   
   paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
 }
+
+for (var_ in var.batch.fact) {
+  pheno[,var_] <- as.factor(pheno[,var_])
+}
+
+########################################################################
+#
+#          Filtering low counts
+#
+########################################################################
+message("Filtering low count genes...")
+keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 10)
+message(sum(keep), " genes remained.")
+counts <- counts[keep,]
 
 ########################################################################
 #
@@ -139,7 +140,12 @@ for (i in 1:nrow(contrasts_)){
     lrt <- edgeR::glmLRT(fit, contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix))
     result = topTags(lrt,adjust.method = p.adjust.method , p.value = P.adjust,n = nrow(dge.list))
     result = result$table
-    result.filter <- result[(abs(result$logCPM) > logFC ) & (result$PValue < Pvalue),]
+    if(is.null(result)){
+      result = as.data.frame(matrix(data = NA , nrow = 1 , ncol = 5))
+      colnames(result) = c("logFC" , "logCPM", "LR"   ,  "PValue" ,"FWER")
+    }else{
+      result.filter <- result[(abs(result$logCPM) > logFC ) & (result$PValue < Pvalue),]
+    }
   
     }else{
     
@@ -147,7 +153,12 @@ for (i in 1:nrow(contrasts_)){
     lrt <- edgeR::glmLRT(fit, contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix))
     result = topTags(lrt,adjust.method = p.adjust.method , p.value = P.adjust,n = nrow(dge.list))
     result = result$table
-    result.filter <- result[(abs(result$logCPM) > logFC ) & (result$PValue < Pvalue),]
+    if(is.null(result)){
+      result = as.data.frame(matrix(data = NA , nrow = 1 , ncol = 5))
+      colnames(result) = c("logFC" , "logCPM", "LR"   ,  "PValue" ,"FWER")
+    }else{
+      result.filter <- result[(abs(result$logCPM) > logFC ) & (result$PValue < Pvalue),]
+    }
     
     
   }
@@ -155,5 +166,3 @@ for (i in 1:nrow(contrasts_)){
   write.csv(result.filter , file = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
                                           ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust,".csv"))
 }
-
-
