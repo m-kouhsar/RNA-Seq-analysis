@@ -139,7 +139,7 @@ for (i in 1:nrow(contrasts_)){
     fit <- edgeR::glmFit(dge.list , design = design.matrix)
     
     lrt <- edgeR::glmLRT(fit, contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix))
-    result = topTags(lrt,adjust.method = p.adjust.method , p.value = P.adjust,n = nrow(dge.list))
+    result = topTags(lrt,adjust.method = p.adjust.method ,n = nrow(dge.list))
     result = result$table
     if(is.null(result)){
       result = as.data.frame(matrix(data = NA , nrow = 1 , ncol = 5))
@@ -152,7 +152,7 @@ for (i in 1:nrow(contrasts_)){
     
     
     lrt <- edgeR::glmLRT(fit, contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix))
-    result = topTags(lrt,adjust.method = p.adjust.method , p.value = P.adjust,n = nrow(dge.list))
+    result = topTags(lrt,adjust.method = p.adjust.method ,n = nrow(dge.list))
     result = result$table
     if(is.null(result)){
       result = as.data.frame(matrix(data = NA , nrow = 1 , ncol = 5))
