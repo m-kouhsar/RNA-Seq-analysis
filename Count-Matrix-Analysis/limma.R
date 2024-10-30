@@ -87,19 +87,6 @@ for (var_ in var.batch.num) {
 
 ########################################################################
 #
-#          Balancing the number of samples in groups
-#
-########################################################################
-pheno <- pheno[c(rownames(pheno)[pheno$Trait == "C"],
-                 rownames(pheno)[pheno$Trait == "AD"],
-                 sample(rownames(pheno)[pheno$Trait=="ADP2"],size = 36,replace = F)),]
-table(pheno$Trait)
-index = match(rownames(pheno) , colnames(counts))
-counts = counts[,index]
-identical(rownames(pheno) , colnames(counts))
-
-########################################################################
-#
 #          DEG analysis
 #
 ########################################################################
@@ -186,11 +173,5 @@ for (i in 1:nrow(contrasts_)){
   write.csv(result.filter , file = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
                                           ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust,".csv"))
 }
-
-########################################################################
-#
-#          Visualization
-#
-########################################################################
 
 
