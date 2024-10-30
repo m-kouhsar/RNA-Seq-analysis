@@ -48,9 +48,16 @@ if(!identical(colnames(counts) , rownames(pheno))){
   }
 }
 
-for (var_ in var.batch.num) {
-  pheno[,var_] <- as.numeric(pheno[,var_])
-}
+
+########################################################################
+#
+#          Filtering low counts
+#
+########################################################################
+message("Filtering low count genes...")
+keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 10)
+message(sum(keep), " genes remained.")
+counts <- counts[keep,]
 
 ########################################################################
 #
@@ -74,15 +81,9 @@ for (var_ in var.batch.fact) {
   pheno[,var_] <- as.factor(pheno[,var_])
 }
 
-########################################################################
-#
-#          Filtering low counts
-#
-########################################################################
-message("Filtering low count genes...")
-keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 10)
-message(sum(keep), " genes remained.")
-counts <- counts[keep,]
+for (var_ in var.batch.num) {
+  pheno[,var_] <- as.numeric(pheno[,var_])
+}
 
 ########################################################################
 #
