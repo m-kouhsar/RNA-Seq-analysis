@@ -106,7 +106,9 @@ fit <- edgeR::glmFit(dge.list , design = design.matrix)
 contrasts_  <- t(combn(groups, 2))
 
 for (i in 1:nrow(contrasts_)){
-  
+  out_name = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
+                    ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust)
+  n.SV1 = n.SV
   if(runSVA){
     pheno.1 <- pheno[pheno$Trait %in% contrasts_[i,],]
     counts.1 <- counts[,pheno$Trait %in% contrasts_[i,]]
@@ -120,10 +122,12 @@ for (i in 1:nrow(contrasts_)){
     
     pheno.1 <- cbind.data.frame(pheno.1 , svs)
     
-    if(ncol(svs) < n.SV){
-      n.SV = ncol(svs)
+    if(ncol(svs) < n.SV1){
+      n.SV1 = ncol(svs)
     }
-    var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV)))
+    out_name = paste0(out_name , ".SV",n.SV1)
+    
+    var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV1)))
     
     dge.list <- DGEList(counts = counts.1,samples = pheno.1)
     
@@ -144,8 +148,6 @@ for (i in 1:nrow(contrasts_)){
     if(is.null(result)){
       result = as.data.frame(matrix(data = NA , nrow = 1 , ncol = 5))
       colnames(result) = c("logFC" , "logCPM", "LR"   ,  "PValue" ,"FWER")
-    }else{
-      result.filter <- result[(abs(result$logCPM) > logFC ) & (result$PValue < Pvalue),]
     }
   
     }else{
@@ -157,13 +159,11 @@ for (i in 1:nrow(contrasts_)){
     if(is.null(result)){
       result = as.data.frame(matrix(data = NA , nrow = 1 , ncol = 5))
       colnames(result) = c("logFC" , "logCPM", "LR"   ,  "PValue" ,"FWER")
-    }else{
-      result.filter <- result[(abs(result$logCPM) > logFC ) & (result$PValue < Pvalue),]
     }
     
     
   }
   
-  write.csv(result.filter , file = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
-                                          ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust,".csv"))
+  result.filter <- result[(abs(result$logFC) > logFC ) & (result$PValue < Pvalue) & (result$FWER < P.adjust),]
+  write.csv(result.filter , file = paste0(out_name , ".csv"))
 }
