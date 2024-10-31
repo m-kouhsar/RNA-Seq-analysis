@@ -101,13 +101,15 @@ colnames(design.matrix)[1:length(groups)] <- groups
 
 dge.list <- estimateDisp(dge.list , design = design.matrix , robust = T)
 
-fit <- voom(dge.list , design = design.matrix , plot = F)
-fit <- lmFit(fit , design = design.matrix)
+fit.voom <- voom(dge.list , design = design.matrix , plot = F)
+fit.lm <- lmFit(fit.voom , design = design.matrix)
 
 contrasts_  <- t(combn(groups, 2))
 
 for (i in 1:nrow(contrasts_)){
-  
+  out_name = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
+                    ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust)
+  n.SV1 = n.SV
   if(runSVA){
     pheno.1 <- pheno[pheno$Trait %in% contrasts_[i,],]
     counts.1 <- counts[,pheno$Trait %in% contrasts_[i,]]
@@ -121,10 +123,12 @@ for (i in 1:nrow(contrasts_)){
     
     pheno.1 <- cbind.data.frame(pheno.1 , svs)
     
-    if(ncol(svs) < n.SV){
-      n.SV = ncol(svs)
+    if(ncol(svs) < n.SV1){
+      n.SV1 = ncol(svs)
     }
-    var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV)))
+    out_name = paste0(out_name , ".SV",n.SV1)
+    
+    var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV1)))
     
     dge.list <- DGEList(counts = counts.1,samples = pheno.1)
     
@@ -137,13 +141,13 @@ for (i in 1:nrow(contrasts_)){
     
     dge.list <- estimateDisp(dge.list , design = design.matrix , robust = T)
     
-    fit <- voom(dge.list , design = design.matrix , plot = F)
-    fit <- lmFit(fit , design = design.matrix)
+    fit.voom <- voom(dge.list , design = design.matrix , plot = F)
+    fit.lm <- lmFit(fit.voom , design = design.matrix)
     contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix)
-    fit <- contrasts.fit(fit , contrast)
-    fit <- eBayes(fit)
-    result = topTable(fit,adjust.method = p.adjust.method ,n = nrow(dge.list))
-    SE = sqrt(fit$s2.post)*fit$stdev.unscaled
+    fit.contrast <- contrasts.fit(fit.lm , contrast)
+    fit.ebays <- eBayes(fit.contrast)
+    result = topTable(fit.ebays,adjust.method = p.adjust.method ,n = nrow(dge.list))
+    SE = sqrt(fit.ebays$s2.post)*fit.ebays$stdev.unscaled
     index = match(rownames(result) , rownames(SE))
     result$SE = SE[index]
     if(is.null(result)){
@@ -155,10 +159,10 @@ for (i in 1:nrow(contrasts_)){
     
     
     contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix)
-    fit <- contrasts.fit(fit , contrast)
-    fit <- eBayes(fit)
-    result = topTable(fit,adjust.method = p.adjust.method ,n = nrow(dge.list))
-    SE = sqrt(fit$s2.post)*fit$stdev.unscaled
+    fit.contrast <- contrasts.fit(fit.lm , contrast)
+    fit.ebays <- eBayes(fit.contrast)
+    result = topTable(fit.ebays,adjust.method = p.adjust.method ,n = nrow(dge.list))
+    SE = sqrt(fit.ebays$s2.post)*fit.ebays$stdev.unscaled
     index = match(rownames(result) , rownames(SE))
     result$SE = SE[index]
     if(is.null(result)){
@@ -170,8 +174,5 @@ for (i in 1:nrow(contrasts_)){
   }
   
   result.filter <- result[(abs(result$logFC) > logFC ) & (result$P.Value < Pvalue) & (result$adj.P.Val < P.adjust),]
-  write.csv(result.filter , file = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
-                                          ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust,".csv"))
+  write.csv(result.filter , file = paste0(out_name , ".csv"))
 }
-
-
