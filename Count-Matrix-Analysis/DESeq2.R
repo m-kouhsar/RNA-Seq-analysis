@@ -116,7 +116,9 @@ for (i in 1:nrow(contrasts_)){
   
   pheno.1 <- pheno[pheno$Trait %in% contrasts_[i,],]
   counts.1 <- counts[,pheno$Trait %in% contrasts_[i,]]
-  
+  out_name = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
+                    ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust)
+  n.SV1 = n.SV
   if(runSVA){
     mod0 <- model.matrix(~1,data=pheno.1)
     design_ <- as.formula(paste0("~",paste(c(var.batch.fact , var.batch.num ) , collapse = "+"),"+",var.trait))
@@ -128,14 +130,14 @@ for (i in 1:nrow(contrasts_)){
     
     pheno.1 <- cbind.data.frame(pheno.1 , svs)
     
-    if(ncol(svs) < n.SV){
-      n.SV = ncol(svs)
+    if(ncol(svs) < n.SV1){
+      n.SV1 = ncol(svs)
     }
     
-    var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV)))
+    var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV1)))
     result <- as.data.frame(DEG.DESeq2(count.data = counts.1 , phenotype.data = pheno.1,trait = var.trait , 
                          batches = var.batch.all,p.adjust.method = p.adjust.method))
-    
+    out_name = paste0(out_name , ".SV",n.SV1)
   }else{
     
     var.batch.all <- c(var.batch.fact , var.batch.num )
@@ -145,6 +147,5 @@ for (i in 1:nrow(contrasts_)){
   }
   
   result.filter <- result[(abs(result$log2FoldChange) > logFC ) & (result$pvalue < Pvalue) & (result$padj < P.adjust),]
-  write.csv(result.filter , file = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
-                                   ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust,".csv"))
+  write.csv(result.filter , file = paste0(out_name , ".csv"))
 }
