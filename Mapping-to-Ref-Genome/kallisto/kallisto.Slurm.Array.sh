@@ -53,7 +53,6 @@ echo -e
 echo "##########################################################################"
 echo -e
 
-result_dir=${result_dir}/kallisto.results.${SLURM_ARRAY_TASK_ID}
 char="/"
 index=$(echo "${fastq_dir}" | awk -F"${char}" '{print NF-1}')
 index=$(( index + 2 ))
