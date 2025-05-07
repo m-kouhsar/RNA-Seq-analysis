@@ -14,20 +14,19 @@ suppressMessages(library("biomaRt"))
 Arguments <- commandArgs(T)
 
 kallisto_res_dir <- trimws(Arguments[1])
-pheno_file <- trimws(Arguments[2]) 
-# Target mapping file contains information (eg. gene ID and type) about the transcripts
-target_map_file <- trimws(Arguments[3]) 
 # pheno_file is a csv file which must contains the following columns:
 #        sample: Samples ID
 #        path: path of the kallisto resuls (inside kallisto_res_dir) folder for each sample
 #        All the variables that are included in lm_model must be represented by a column with the same name
-
+pheno_file <- trimws(Arguments[2]) 
+# Target mapping file contains information (eg. gene ID and type) about the transcripts
+target_map_file <- trimws(Arguments[3]) 
 lm_model <- as.formula(Arguments[4])
 # Factor variable include condition variable in lm_model
 var_factor <- trimws(str_split_1(Arguments[5],pattern = ","))    
 # Numerical varaibles in lm_model
 var_numeric <- trimws(str_split_1(Arguments[6],pattern = ","))   
-OutPrefix <- trimws(Arguments[6])
+OutPrefix <- trimws(Arguments[7])
 
 if(is.na(OutPrefix)){
   OutPrefix <- ""
@@ -42,6 +41,7 @@ message("        Factor variables in the model: ",var_factor)
 message("        Numeric variables in the model: ",var_numeric)
 message("        Output files prefix: ",OutPrefix)
 
+message("#########################################################")
 
 if(!all(tolower(all.vars(lm_model)) %in% tolower(c(var_factor,var_numeric)))){
   stop("The following variables in the regression model are not specified as factor or numeric variables:\n",
