@@ -108,7 +108,7 @@ Outliers.id <- Outliers$Data.2D[Outliers$Data.2D$Outlier=="Yes" , ]
 
 if(nrow(Outliers.id) > 0){
   
-  message(nrow(Outliers.id) , "outliers found:\n" , paste(rownames(Outliers.id), collapse = ", "))
+  message(nrow(Outliers.id) , " outliers found:\n" , paste(rownames(Outliers.id), collapse = ", "))
   
   message("Saving Outlier plots..")
   tiff(filename = paste0(OutPrefix , ".OutlierPlot.2D.tif") , res = 300 , units = "in" , height = 8 , width = 8)
