@@ -108,7 +108,7 @@ Outliers.id <- Outliers$Data.2D[Outliers$Data.2D$Outlier=="Yes" , ]
 
 if(nrow(Outliers.id) > 0){
   
-  message(nrow(Outliers.id) , "outliers found:\n" , paste(rownames(Outliers.id), collapse = ", "))
+  message(nrow(Outliers.id) , " outliers found:\n" , paste(rownames(Outliers.id), collapse = ", "))
   
   message("Saving Outlier plots..")
   tiff(filename = paste0(OutPrefix , ".OutlierPlot.2D.tif") , res = 300 , units = "in" , height = 8 , width = 8)
@@ -124,8 +124,9 @@ if(nrow(Outliers.id) > 0){
   graphics.off()
   
   message("Removing outliers and updating SO object...")
-  pheno <- pheno[!(pheno$sample %in% rownames(Outliers.id)),]
-  so <- sleuth_prep(pheno,target_mapping = target_map,extra_bootstrap_summary = TRUE)
+  pheno.so <- so$sample_to_covariates
+  pheno.so <- pheno.so[!(pheno.so$sample %in% rownames(Outliers.id)),]
+  so <- sleuth_prep(pheno.so,target_mapping = target_map,extra_bootstrap_summary = TRUE)
   message("Saving updated Sleuth Object in ",SO_file," ...")
   save(so, Outliers,file = SO_file)
   
@@ -158,6 +159,7 @@ so_fit <- sleuth_fit(so, lm_model)
 d_matrix.group <- colnames(so_fit$fits$full$design_matrix)[2]
 so_fit.wt <- sleuth_wt(so_fit,d_matrix.group)
 results_table <- sleuth_results(so_fit.wt, d_matrix.group, test_type = 'wt')
+print(head(results_table))
 
 message("Saving results in ",paste0(OutPrefix , ".sleuth.DEG.tsv")," ...")
 write.table(results_table , file = paste0(OutPrefix , ".sleuth.DEG.tsv"), quote = F , sep = "\t" , row.names = F)
