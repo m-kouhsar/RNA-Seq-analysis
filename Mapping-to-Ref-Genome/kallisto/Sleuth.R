@@ -9,6 +9,7 @@ suppressMessages(library(sleuth))
 suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
 suppressMessages(library(tibble))
+suppressMessages(library(qqman))
 
 #################### Preparing input arguments #################
 
@@ -52,14 +53,14 @@ message("        Output files prefix: ",OutPrefix)
 
 message("#########################################################")
 
-if(!all(tolower(all.vars(lm_model)) %in% tolower(c(var_factor,var_numeric)))){
+if(!all(all.vars(lm_model) %in% c(var_factor,var_numeric))){
   stop("The following variables in the regression model are not specified as factor or numeric variables:\n",
        paste(setdiff(all.vars(lm_model) , c(var_factor,var_numeric)),collapse = ", "))
 }
 
 pheno <- read.csv(pheno_file , stringsAsFactors = F)
 
-if(!all(c("sample","path",tolower(all.vars(lm_model))) %in% tolower(colnames(pheno)))){
+if(!all(c("sample","path",all.vars(lm_model)) %in% colnames(pheno))){
   
   stop("The following variables can't be find in phenotype file: \n",
        paste(setdiff(c("sample","path",all.vars(lm_model)), colnames(pheno)),collapse = ", "))
@@ -160,6 +161,10 @@ d_matrix.group <- colnames(so_fit$fits$full$design_matrix)[2]
 so_fit.wt <- sleuth_wt(so_fit,d_matrix.group)
 results_table <- sleuth_results(so_fit.wt, d_matrix.group, test_type = 'wt')
 print(head(results_table))
+
+tiff(filename = paste0(OutPrefix , ".sleuth.DEG.QQ.tif") , res = 300 , units = "in" , height = 8 , width = 8)
+print(qq(results_table$pval))
+graphics.off()
 
 message("Saving results in ",paste0(OutPrefix , ".sleuth.DEG.tsv")," ...")
 write.table(results_table , file = paste0(OutPrefix , ".sleuth.DEG.tsv"), quote = F , sep = "\t" , row.names = F)
