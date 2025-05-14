@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=16 # specify number of processors.
 #SBATCH --mail-type=END # send email at job completion
 #SBATCH --mail-user=m.kouhsar@exeter.ac.uk # email address
-#SBATCH --output=Sleuth.%j.out
+#SBATCH --output=Sleuth.DEG.%j.out
 
 #################### Input Arguments ################################################################################
 

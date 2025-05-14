@@ -26,13 +26,13 @@
 
 #######################################################################################################################
 
-kallisto_res_dir="/lustre/projects/Research_Project-191391/Morteza/kallisto/UKBBN/"
-pheno_file="/lustre/projects/Research_Project-191391/Morteza/kallisto/UKBBN.Phenotype.Labeled.csv"
+kallisto_res_dir="/lustre/projects/Research_Project-191391/Morteza/kallisto/BDR/"
+pheno_file="/lustre/projects/Research_Project-191391/Morteza/kallisto/BDR.Phenotype.Labeled.csv"
 target_map_file="/lustre/projects/Research_Project-191391/Morteza/kallisto/Human.Transcript.Ensemble.GRCh38.txt"
 factor_variables="Phenotype,Gender"  
 numeric_variables="Age,RIN"
 RemoveOutliers=Yes
-OutPrefix="/lustre/projects/Research_Project-191391/Morteza/kallisto/UKBBN"
+OutPrefix="/lustre/projects/Research_Project-191391/Morteza/kallisto/Results/BDR"
 ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analysis/Mapping-to-Ref-Genome/kallisto/"
 
 #######################################################################################################################

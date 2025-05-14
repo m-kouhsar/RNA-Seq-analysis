@@ -60,7 +60,7 @@ message("        Script directory: ",ScriptDir)
 
 message("#########################################################")
 
-dir.create(path = dirname(OutPrefix),recursive = T)
+dir.create(path = dirname(OutPrefix),recursive = T,showWarnings = F)
 
 pheno <- read.csv(pheno_file , stringsAsFactors = F)
 

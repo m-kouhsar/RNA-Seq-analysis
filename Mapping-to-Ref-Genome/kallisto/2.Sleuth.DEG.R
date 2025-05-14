@@ -33,8 +33,8 @@ OutPrefix <- trimws(Arguments[6])
 if(is.na(OutPrefix)){
   OutPrefix <- ""
 }
-var_factor <- str_split_1(var_factor , pattern = ",")
-var_numeric <- str_split_1(var_numeric , pattern = ",")
+var_factor <- trimws(str_split_1(var_factor , pattern = ","))
+var_numeric <- trimws(str_split_1(var_numeric , pattern = ","))
 
 message("Input arguments:")
 message("        Sleuth Object file: ",SO_file)
@@ -46,7 +46,7 @@ message("        Output files prefix: ",OutPrefix)
 
 message("#########################################################")
 
-dir.create(path = dirname(OutPrefix),recursive = T)
+dir.create(path = dirname(OutPrefix),recursive = T,showWarnings = F)
 
 if(!all(all.vars(lm_model) %in% c(var_factor,var_numeric))){
   stop("The following variables in the regression model are not specified as factor or numeric variables:\n",
@@ -95,7 +95,10 @@ message("Inflation index: ",round(inflation, digits = 2))
 
 tiff(filename = paste0(OutPrefix , ".sleuth.DEG.QQ.tif") , res = 300 , units = "in" , height = 8 , width = 8)
 qq(results_table$pval, main="QQ plot")
-text(x = 0.5,y=6,label = paste("Inlation index:",round(inflation, digits = 2)))
+text(x = 0.5,y = (par("usr")[4]-0.2),
+     label = bquote(lambda == .(round(inflation, 2))),
+     adj = c(0, 1),
+     cex = 1)
 graphics.off()
 
 message("Saving results in ",paste0(OutPrefix , ".sleuth.DEG.tsv")," ...")
