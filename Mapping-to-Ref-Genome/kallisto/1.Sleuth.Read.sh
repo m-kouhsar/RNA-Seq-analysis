@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=16 # specify number of processors.
 #SBATCH --mail-type=END # send email at job completion
 #SBATCH --mail-user=m.kouhsar@exeter.ac.uk # email address
-#SBATCH --output=Sleuth.%j.out
+#SBATCH --output=Sleuth.Read.%j.out
 
 #################### Input Arguments ################################################################################
 
@@ -16,30 +16,26 @@
 # pheno_file: is a csv file which must contains the following columns:
 #             sample: Samples ID
 #             path: path of the kallisto resuls (inside kallisto_res_dir) folder for each sample
-#             All the variables that are included in lm_model must be represented by a column with the same name
+#             All factor and numeric variables must be represented by a column with the same name
 # target_map_file: Target mapping file contains information (eg. gene ID and type) about the transcripts
-# lm_model: linear regression model to run the test
-# factor_variables: Factor variable include condition variable in lm_model
-# numeric_variables : Numerical varaibles in lm_model
-# PCs: Number of principal components you want to add to the analysis as covariates
-# RunDEG: Do you want to run DEG analysis based on the model you set? (set it to 'yes' or 'no')
+# factor_variables: Factor variables in the correlation plot (separated by comma)
+# numeric_variables : Numerical varaibles in the correlation plot (separated by comma)
+# RemoveOutliers: Do you want to remove outlier samples from the data? (set it to 'yes' or 'no')
 # OutPrefix: Results files/images prefix (can contains a directory)
 # ScriptDir: Directory of all Scripts related to this analysis 
 
 #######################################################################################################################
 
-kallisto_res_dir="/lustre/projects/Research_Project-191391/Morteza/kallisto/BDR/"
-pheno_file="/lustre/projects/Research_Project-191391/Morteza/kallisto/BDR.Phenotype.Labeled.csv"
+kallisto_res_dir="/lustre/projects/Research_Project-191391/Morteza/kallisto/UKBBN/"
+pheno_file="/lustre/projects/Research_Project-191391/Morteza/kallisto/UKBBN.Phenotype.Labeled.csv"
 target_map_file="/lustre/projects/Research_Project-191391/Morteza/kallisto/Human.Transcript.Ensemble.GRCh38.txt"
-lm_model="~Phenotype+Age+Gender+RIN"
 factor_variables="Phenotype,Gender"  
 numeric_variables="Age,RIN"
-PCs=0
-RunDEG=Yes
-OutPrefix="/lustre/projects/Research_Project-191391/Morteza/kallisto/BDR"
+RemoveOutliers=Yes
+OutPrefix="/lustre/projects/Research_Project-191391/Morteza/kallisto/UKBBN"
 ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analysis/Mapping-to-Ref-Genome/kallisto/"
 
 #######################################################################################################################
 
-Rscript ${ScriptDir}/Sleuth.R $kallisto_res_dir $pheno_file $target_map_file $lm_model $factor_variables $numeric_variables $PCs $RunDEG $OutPrefix $ScriptDir 
+Rscript ${ScriptDir}/1.Sleuth.Read.R $kallisto_res_dir $pheno_file $target_map_file $factor_variables $numeric_variables $RemoveOutliers $OutPrefix $ScriptDir 
 
