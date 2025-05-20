@@ -17,7 +17,7 @@
 #             sample: Samples ID
 #             path: path of the kallisto resuls (inside kallisto_res_dir) folder for each sample
 #             All factor and numeric variables must be represented by a column with the same name
-# target_map_file: Target mapping file contains information (eg. gene ID and type) about the transcripts
+# target_map_file: Target mapping file contains information (eg. gene ID and type) about the transcripts. It must be a tsv file contains "target_id" column
 # factor_variables: Factor variables in the correlation plot (separated by comma)
 # numeric_variables : Numerical varaibles in the correlation plot (separated by comma)
 # RemoveOutliers: Do you want to remove outlier samples from the data? (set it to 'yes' or 'no')
