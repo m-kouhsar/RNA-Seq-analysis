@@ -37,5 +37,5 @@ ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analy
 
 #######################################################################################################################
 
-Rscript ${ScriptDir}/1.Sleuth.Read.R $kallisto_res_dir $pheno_file $target_map_file $factor_variables $numeric_variables $RemoveOutliers $OutPrefix $ScriptDir 
+Rscript ${ScriptDir}/Sleuth.Read.R $kallisto_res_dir $pheno_file $target_map_file $factor_variables $numeric_variables $RemoveOutliers $OutPrefix $ScriptDir 
 

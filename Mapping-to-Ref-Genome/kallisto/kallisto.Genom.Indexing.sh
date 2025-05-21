@@ -11,8 +11,8 @@
 
 ######################################################################################################################
 
-OutPrefix=/lustre/projects/Research_Project-191391/Morteza/kallisto/Ref/GRCh38.p14
-Genome_fasta="/lustre/projects/Research_Project-191391/Morteza/kallisto/Ref/gencode.v48.transcripts.fa"
+OutPrefix=/lustre/projects/Research_Project-191391/Morteza/kallisto/Ref/GRCh38.ensembl.111.cdna
+Genome_fasta="/lustre/projects/Research_Project-191391/Morteza/kallisto/Ref/Homo_sapiens.GRCh38.cdna.all.fa"
 Threads=15
 
 ######################################################################################################################

@@ -15,7 +15,7 @@
 ##############################################################################################################
 ##############################################################################################################
 fastq_dir=/lustre/projects/Research_Project-191391/Project_10202/11_fastp_trimmed                                    # Directory contains fastq files
-GenomeIndex=/lustre/projects/Research_Project-191391/Morteza/kallisto/Ref/GRCh38_kallistoIndex.idx               # Genome Index file
+GenomeIndex="/lustre/projects/Research_Project-191391/Morteza/kallisto/Ref/GRCh38.p14_kallistoIndex.idx"               # Genome Index file
 result_dir=/lustre/projects/Research_Project-191391/Morteza/kallisto/Results/BDR                                                # Output files prefix
 Threads=15
 
