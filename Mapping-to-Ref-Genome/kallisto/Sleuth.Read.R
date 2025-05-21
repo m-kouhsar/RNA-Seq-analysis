@@ -1,7 +1,8 @@
 message("#########################################################")
 message("kallisto pipeline version 1.0.0")
 message("Wrote by m.kouhsar@exeter.ac.uk")
-message("R script for running DEG analysis using the Sleuth package")
+message("R script for reading kallisto results using the Sleuth package.")
+message("A Sleuth object will be generated and saved.")
 message("#########################################################")
 
 suppressMessages(library(stringr))
@@ -80,7 +81,12 @@ pheno$path <- paste(kallisto_res_dir , pheno$path , sep = "/")
 
 ################### Reading kallisto results #################
 
-target_map <- read.delim(target_map_file, stringsAsFactors = F , header = T , sep = "\t")
+if(target_map_file=="" | is.na(target_map_file)){
+  target_map <- NULL
+}else{
+  target_map <- read.delim(target_map_file, stringsAsFactors = F , header = T , sep = "\t")
+}
+
 
 SO_file <- paste0(OutPrefix , ".SO.rdat")
 

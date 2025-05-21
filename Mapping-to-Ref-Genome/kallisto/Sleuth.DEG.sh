@@ -31,5 +31,5 @@ ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analy
 
 #######################################################################################################################
 
-Rscript ${ScriptDir}/Sleuth.DEG.R $SO_file $lm_model $factor_variables $numeric_variables $PCs $OutPrefix 
+Rscript ${ScriptDir}/Sleuth.DEG.R "$SO_file" "$lm_model" "$factor_variables" "$numeric_variables" "$PCs" "$OutPrefix" 
 
