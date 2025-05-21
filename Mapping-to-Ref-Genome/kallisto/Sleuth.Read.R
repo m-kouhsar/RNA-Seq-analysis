@@ -82,6 +82,7 @@ pheno$path <- paste(kallisto_res_dir , pheno$path , sep = "/")
 ################### Reading kallisto results #################
 
 if(target_map_file=="" | is.na(target_map_file)){
+  message("No target mapping file provided.")
   target_map <- NULL
 }else{
   target_map <- read.delim(target_map_file, stringsAsFactors = F , header = T , sep = "\t")
