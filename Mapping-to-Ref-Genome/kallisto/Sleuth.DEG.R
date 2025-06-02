@@ -28,13 +28,19 @@ lm_model <- trimws(Arguments[2])
 var_factor <- trimws(Arguments[3])    
 var_numeric <- trimws(Arguments[4])  
 PCs <- as.numeric(trimws(Arguments[5]))
-OutPrefix <- trimws(Arguments[6])
+save_fit <- trimws(Arguments[6])
+OutPrefix <- trimws(Arguments[7])
 
 if(is.na(OutPrefix)){
   OutPrefix <- ""
 }
 var_factor <- trimws(str_split_1(var_factor , pattern = ","))
 var_numeric <- trimws(str_split_1(var_numeric , pattern = ","))
+if(tolower(save_fit) == "yes"){
+  save_fit = T
+}else{
+  save_fit=F
+}
 
 message("Input arguments:")
 message("        Sleuth Object file: ",SO_file)
@@ -42,6 +48,7 @@ message("        Linear regression model: ",lm_model)
 message("        Factor variables in the model: ",paste(var_factor, collapse = ", "))
 message("        Numeric variables in the model: ",paste(var_numeric,collapse=", "))
 message("        Number of PCs to add to the model: ",PCs)
+message("        Save fit object: ",save_fit)
 message("        Output files prefix: ",OutPrefix)
 
 message("#########################################################")
@@ -79,10 +86,17 @@ if(PCs > 0){
   so$sample_to_covariates <- pheno.so
   lm_model <- paste0(lm_model ,"+", paste0("PC",1:PCs, collapse = "+"))
 }
+
 lm_model <- as.formula(lm_model)
 so_fit <- sleuth_fit(so, lm_model)
 
+if(save_fit){
+  message("Saving sleuth fit object to ",paste0(OutPrefix , ".sleuth.DEG.tsv"),"...")
+  save(so_fit ,file = paste0(OutPrefix , ".sleuth.Fit.rdat") )
+}
+
 d_matrix.group <- colnames(so_fit$fits$full$design_matrix)[2]
+message("which_beta argument in sleuth_wt function is set to ",d_matrix.group)
 so_fit.wt <- sleuth_wt(so_fit,d_matrix.group)
 results_table <- sleuth_results(so_fit.wt, d_matrix.group, test_type = 'wt')
 

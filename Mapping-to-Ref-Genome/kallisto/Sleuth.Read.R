@@ -140,11 +140,11 @@ if(RemoveOutliers=="yes"){
     graphics.off()
     
     tiff(filename = paste0(OutPrefix , ".OutlierPlot.QQ.tif") , res = 300 , units = "in" , height = 8 , width = 8)
-    print(Outliers$Plot.Dist)
+    print(Outliers$Plot.QQ)
     graphics.off()
     
     tiff(filename = paste0(OutPrefix , ".OutlierPlot.Dist.tif") , res = 300 , units = "in" , height = 8 , width = 8)
-    print(Outliers$Plot.QQ)
+    print(Outliers$Plot.Dist)
     graphics.off()
     
     message("Removing outliers and updating SO object...")

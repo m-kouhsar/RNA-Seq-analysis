@@ -17,6 +17,7 @@
 # factor_variables: Factor variable include condition variable in lm_model
 # numeric_variables : Numerical varaibles in lm_model
 # PCs: Number of principal components you want to add to the analysis as covariates
+# Save_Fit_Obj: If you set it to yes, the OS object after runninf fit function will be saved as a rdat file. 
 # OutPrefix: Results files/images prefix (can contains a directory)
 
 #######################################################################################################################
@@ -26,10 +27,11 @@ lm_model="~Phenotype+Age+Gender+RIN"
 factor_variables="Phenotype,Gender"  
 numeric_variables="Age,RIN"
 PCs=0
+Save_Fit_Obj=no  #yes or no
 OutPrefix="/lustre/projects/Research_Project-191391/Morteza/kallisto/BDR"
 ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analysis/Mapping-to-Ref-Genome/kallisto/"
 
 #######################################################################################################################
 
-Rscript ${ScriptDir}/Sleuth.DEG.R "$SO_file" "$lm_model" "$factor_variables" "$numeric_variables" "$PCs" "$OutPrefix" 
+Rscript ${ScriptDir}/Sleuth.DEG.R "$SO_file" "$lm_model" "$factor_variables" "$numeric_variables" "$PCs" "$Save_Fit_Obj" "$OutPrefix" 
 
