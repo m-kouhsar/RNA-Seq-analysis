@@ -14,24 +14,22 @@
 
 # SO_file: Sleuth Object file (created by 1.Sleuth.Read.R)
 # lm_model: linear regression model to run the test
-# factor_variables: Factor variable include condition variable in lm_model
-# numeric_variables : Numerical varaibles in lm_model
 # PCs: Number of principal components you want to add to the analysis as covariates
-# Save_Fit_Obj: If you set it to yes, the OS object after runninf fit function will be saved as a rdat file. 
+# SVs: Number of surrogate variables you want to add to the analysis as covariates
 # OutPrefix: Results files/images prefix (can contains a directory)
 
 #######################################################################################################################
 
-SO_file="/lustre/projects/Research_Project-191391/Morteza/kallisto/BDR.SO.rdat"
+SO_file="/lustre/projects/Research_Project-191391/Morteza/kallisto/Results/NIH.111.SO.rdat"
 lm_model="~Phenotype+Age+Gender+RIN"
-factor_variables="Phenotype,Gender"  
-numeric_variables="Age,RIN"
-PCs=0
-Save_Fit_Obj=no  #yes or no
-OutPrefix="/lustre/projects/Research_Project-191391/Morteza/kallisto/BDR"
+PCs=10
+SVs=0
+OutPrefix="/lustre/projects/Research_Project-191391/Morteza/kallisto/Results/NIH.PC10"
+
+
 ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analysis/Mapping-to-Ref-Genome/kallisto/"
 
 #######################################################################################################################
 
-Rscript ${ScriptDir}/Sleuth.DEG.R "$SO_file" "$lm_model" "$factor_variables" "$numeric_variables" "$PCs" "$Save_Fit_Obj" "$OutPrefix" 
+Rscript ${ScriptDir}/Sleuth.DEG.R $SO_file $lm_model $PCs $SVs $OutPrefix 
 

@@ -46,8 +46,8 @@ if(is.na(OutPrefix)){
 source(paste0(ScriptDir , "/mahalanobis.outlier.R"))
 source(paste0(ScriptDir , "/CovariatePlot.R"))
 
-var_factor <- str_split_1(var_factor , pattern = ",")
-var_numeric <- str_split_1(var_numeric , pattern = ",")
+var_factor <- trimws(str_split_1(var_factor , pattern = ","))
+var_numeric <- trimws(str_split_1(var_numeric , pattern = ","))
 
 message("Input arguments:")
 message("        kallisto results directory: ",kallisto_res_dir)
