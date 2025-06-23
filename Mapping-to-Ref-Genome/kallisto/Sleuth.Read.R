@@ -76,11 +76,8 @@ if(file.exists(SO_file)){
   
 }else{
   
-  
   so <- sleuth_prep(pheno,target_mapping = target_map,extra_bootstrap_summary = TRUE)
   
-  message("Saving Sleuth Object in ",SO_file," ...")
-  save(so,file = SO_file)
 }
 
 tpm.norm <- so$obs_norm[, c(1,2,4)]
@@ -125,13 +122,16 @@ if(RemoveOutliers=="yes"){
     pheno.so$path <- pheno$path[index]
     
     so <- sleuth_prep(pheno.so,target_mapping = target_map,extra_bootstrap_summary = TRUE)
-    message("Saving updated Sleuth Object in ",SO_file," ...")
+    message("Saving updated Sleuth Object and outliers in ",SO_file," ...")
     save(so, Outliers,file = SO_file)
     
   }else{
     message("There is no outlier sample in the data.")
   }
   
+}else{
+  message("Saving Sleuth Object in ",SO_file," ...")
+  save(so,file = SO_file)
 }
 
 message("All done!")
