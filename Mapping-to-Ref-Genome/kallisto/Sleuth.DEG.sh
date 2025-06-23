@@ -14,8 +14,9 @@
 
 # SO_file: Sleuth Object file (created by 1.Sleuth.Read.R)
 # lm_model: linear regression model to run the test
-# PCs: Number of principal components you want to add to the analysis as covariates
-# SVs: Number of surrogate variables you want to add to the analysis as covariates
+# PCs: Number of principal components you want to add to the model
+# SVs: Number of surrogate variables you want to add to the model
+# save_updated_so: Would you like to save SO (and SVA) object after running test? (yes/no)
 # OutPrefix: Results files/images prefix (can contains a directory)
 
 #######################################################################################################################

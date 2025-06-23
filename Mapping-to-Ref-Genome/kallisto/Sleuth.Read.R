@@ -18,10 +18,7 @@ suppressMessages(library(qqman))
 # pheno_file: is a csv file which must contains the following columns:
 #             sample: Samples ID
 #             path: path of the kallisto resuls (inside kallisto_res_dir) folder for each sample
-#             All factor and numeric variables must be represented by a column with the same name
 # target_map_file: Target mapping file contains information (eg. gene ID and type) about the transcripts
-# var_factor: Factor variable in correlation plot
-# var_numeric : Numerical varaibles in correlation plot
 # RemoveOutliers: Do you want to remove outlier samples from the data? (set it to 'yes' or 'no')
 # OutPrefix: Results files/images prefix (can contains a directory)
 # ScriptDir: Directory of all Scripts related to this analysis 
@@ -32,11 +29,9 @@ Arguments <- commandArgs(T)
 kallisto_res_dir <- trimws(Arguments[1])
 pheno_file <- trimws(Arguments[2]) 
 target_map_file <- trimws(Arguments[3]) 
-var_factor <- trimws(Arguments[4])    
-var_numeric <- trimws(Arguments[5]) 
-RemoveOutliers <- tolower(trimws(Arguments[6]))
-OutPrefix <- trimws(Arguments[7])
-ScriptDir <- trimws(Arguments[8])
+RemoveOutliers <- tolower(trimws(Arguments[4]))
+OutPrefix <- trimws(Arguments[5])
+ScriptDir <- trimws(Arguments[6])
 
 if(is.na(OutPrefix)){
   OutPrefix <- ""
@@ -46,15 +41,10 @@ if(is.na(OutPrefix)){
 source(paste0(ScriptDir , "/mahalanobis.outlier.R"))
 source(paste0(ScriptDir , "/CovariatePlot.R"))
 
-var_factor <- trimws(str_split_1(var_factor , pattern = ","))
-var_numeric <- trimws(str_split_1(var_numeric , pattern = ","))
-
 message("Input arguments:")
 message("        kallisto results directory: ",kallisto_res_dir)
 message("        Phenotype file: ",pheno_file)
 message("        Target mapping file: ",target_map_file)
-message("        Factor variables in the model: ",paste(var_factor, collapse = ", "))
-message("        Numeric variables in the model: ",paste(var_numeric,collapse=", "))
 message("        Removing Outliers: ",RemoveOutliers)
 message("        Output files prefix: ",OutPrefix)
 message("        Script directory: ",ScriptDir)
@@ -65,18 +55,6 @@ dir.create(path = dirname(OutPrefix),recursive = T,showWarnings = F)
 
 pheno <- read.csv(pheno_file , stringsAsFactors = F)
 
-if(!all(c("sample","path",var_factor , var_numeric) %in% colnames(pheno))){
-  
-  stop("The following variables can't be find in phenotype file: \n",
-       paste(setdiff(c("sample","path",var_factor , var_numeric), colnames(pheno)),collapse = ", "))
-}
-
-for (v in var_factor) {
-  pheno[,v] <- as.factor(pheno[,v])
-}
-for (v in var_numeric) {
-  pheno[,v] <- as.numeric(pheno[,v])
-}
 pheno$path <- paste(kallisto_res_dir , pheno$path , sep = "/")
 
 ################### Reading kallisto results #################
@@ -112,13 +90,6 @@ pheno.so <- so$sample_to_covariates
 index <- match(pheno.so$sample , colnames(tpm.norm))
 tpm.norm <- tpm.norm[,index]
 rownames(pheno.so) <- pheno.so$sample
-
-
-P <- CovariatePlot(Data = tpm.norm , Phenotype = pheno.so , Factor_var = var_factor , 
-                   Numeric_var = var_numeric,Plot_titel = "Correlation Plot" )
-tiff(filename = paste0(OutPrefix , ".PC.Corr.tif") , res = 300 , units = "in" , height = 8 , width = 8)
-print(P)
-graphics.off()
 
 if(RemoveOutliers=="yes"){
   

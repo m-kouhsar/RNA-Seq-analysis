@@ -16,7 +16,9 @@ suppressMessages(library(sva))
 
 # SO_file: Sleuth Object file (created by 1.Sleuth.Read.R)
 # lm_model: linear regression model to run the test
-# PCs: Number of principal components you want to add to the analysis as covariates
+# PCs: Number of principal components you want to add to the model
+# SVs: Number of surrogate variables you want to add to the model
+# save_updated_so: Would you like to save SO (and SVA) object after running test? (yes/no)
 # OutPrefix: Results files/images prefix (can contains a directory)
 
 ####################################################################
@@ -26,7 +28,8 @@ SO_file <- trimws(Arguments[1])
 lm_model <- trimws(Arguments[2])
 PCs <- as.numeric(trimws(Arguments[3]))
 SVs <- as.numeric(trimws(Arguments[4]))
-OutPrefix <- trimws(Arguments[5])
+save_updated_so <- trimws(Arguments[5])
+OutPrefix <- trimws(Arguments[6])
 
 if(is.na(OutPrefix)){
   OutPrefix <- ""
@@ -37,6 +40,7 @@ message("        Sleuth Object file: ",SO_file)
 message("        Linear regression model: ",lm_model)
 message("        Number of PCs to add to the model: ",PCs)
 message("        Number of Surrogate Variable to add to the model: ",SVs)
+message("        Save updated SO object after test: ",save_updated_so)
 message("        Output files prefix: ",OutPrefix)
 
 message("#########################################################")
@@ -126,11 +130,13 @@ graphics.off()
 message("Saving DEG summary statistics in ",paste0(OutPrefix , ".sleuth.DEG.tsv")," ...")
 write.table(results_table , file = paste0(OutPrefix , ".sleuth.DEG.tsv"), quote = F , sep = "\t" , row.names = F)
 
-message("Saving updated SO object in ",SO_file," ...")
-
-possible_objects <- c("so", "sva_obj", "Outliers")
-possible_objects <- possible_objects[sapply(possible_objects, exists)]
-
-save(list = possible_objects , file = SO_file)
+if(tolower(save_updated_so)=="yes"){
+  message("Saving updated SO object in ",SO_file," ...")
+  
+  possible_objects <- c("so", "sva_obj", "Outliers")
+  possible_objects <- possible_objects[sapply(possible_objects, exists)]
+  
+  save(list = possible_objects , file = SO_file)
+}
 
 message("All done!")

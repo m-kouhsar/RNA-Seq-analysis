@@ -16,10 +16,7 @@
 # pheno_file: is a csv file which must contains the following columns:
 #             sample: Samples ID
 #             path: path of the kallisto resuls (inside kallisto_res_dir) folder for each sample
-#             All factor and numeric variables must be represented by a column with the same name
 # target_map_file: (Optional) Target mapping file contains information (eg. gene ID and type) about the transcripts. It must be a tsv file contains "target_id" column
-# factor_variables: Factor variables in the correlation plot (separated by comma)
-# numeric_variables : Numerical varaibles in the correlation plot (separated by comma)
 # RemoveOutliers: Do you want to remove outlier samples from the data? (set it to 'yes' or 'no')
 # OutPrefix: Results files/images prefix (can contains a directory)
 # ScriptDir: Directory of all Scripts related to this analysis 
@@ -37,5 +34,4 @@ ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analy
 
 #######################################################################################################################
 
-Rscript ${ScriptDir}/Sleuth.Read.R "$kallisto_res_dir" "$pheno_file" "$target_map_file" "$factor_variables" "$numeric_variables" "$RemoveOutliers" "$OutPrefix" "$ScriptDir" 
-
+Rscript ${ScriptDir}/Sleuth.Read.R "$kallisto_res_dir" "$pheno_file" "$target_map_file" "$RemoveOutliers" "$OutPrefix" "$ScriptDir" 
