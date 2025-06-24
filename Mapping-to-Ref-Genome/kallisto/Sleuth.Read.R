@@ -127,6 +127,8 @@ if(RemoveOutliers=="yes"){
     
   }else{
     message("There is no outlier sample in the data.")
+    message("Saving Sleuth Object in ",SO_file," ...")
+    save(so,file = SO_file)
   }
   
 }else{

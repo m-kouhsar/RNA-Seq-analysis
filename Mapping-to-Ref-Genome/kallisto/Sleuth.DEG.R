@@ -70,7 +70,7 @@ if(PCs > 0){
   pca <- rownames_to_column(pca)
   message("Adding PCs to the model...")
   index <- match(pheno.so$sample , pca$rowname)
-  pheno.so <- cbind.data.frame(pheno.so , pca[index,-1])
+  pheno.so <- cbind.data.frame(pheno.so , pca[index,-1,drop = FALSE])
   so$sample_to_covariates <- pheno.so
   lm_model <- paste0(lm_model ,"+", paste0("PC",1:PCs, collapse = "+"))
 }
