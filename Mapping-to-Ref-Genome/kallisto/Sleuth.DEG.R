@@ -76,7 +76,7 @@ if(PCs > 0){
 }
 
 if(SVs > 0){
-  if(!exists("sva_df")){
+  if(!exists("sva_obj")){
     
     print("Calculating Surrogate Variables...")
     mod1 = model.matrix(as.formula(lm_model), data=pheno.so)
