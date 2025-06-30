@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH -A Research_Project1                            # research project to submit under.
+#SBATCH -A  Research_Project-MRC164847                  # research project to submit under.
 #SBATCH --export=ALL                                    # export all environment variables to the batch job.
 #SBATCH -D .                                            # set working directory to .
 #SBATCH -p mrcq                                         # submit to the parallel test queue
-#SBATCH --time=5:00:00                                  # Maximum wall time for the job
+#SBATCH --time=10:00:00                                  # Maximum wall time for the job
 #SBATCH --nodes=1                                       # specify number of nodes.
 #SBATCH --ntasks-per-node=16                            # specify number of processors.
 #SBATCH --mail-type=END                                 # send email at job completion
@@ -11,12 +11,15 @@
 #SBATCH --array=0-15
 #SBATCH --job-name=STAR
 
+################################################################################################################
+DataDir="/lustre/projects/Research_Project-T111004/Project_11556/X0052/11_cuta_trimmed"
+GenomeIndexDir="/lustre/projects/Research_Project-T111004/Morteza/GenomeIndex/STAR/GRCh38.p14.PRI.GENECODE.R48"
+OutDir="/lustre/projects/Research_Project-T111004/Morteza/Ascribed_Study/Results/STAR"
+
+################################################################################################################
+
 echo Job started on:
 date -u
-
-InDir=./RNASeq.fastq
-GenomeIndexDir=./STAR/genome_index
-OutDir=./STAR/Results
 
 module load STAR
 

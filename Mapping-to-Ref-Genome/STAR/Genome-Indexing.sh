@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -A Research_Project1 # research project to submit under.
+#SBATCH -A  Research_Project-MRC164847 # research project to submit under.
 #SBATCH --export=ALL # export all environment variables to the batch job.
 #SBATCH -p mrcq # submit to the parallel test queue
 #SBATCH --time=5:00:00 # Maximum wall time for the job
@@ -10,9 +10,9 @@
 
 ######################################################################################################################
 
-OutDir=./genome_index
-Genome_fasta=./references/GRCh37.p13.genome.fa
-Genome_annotation=./references/gencode.v19.annotation.gff3
+OutDir="/lustre/projects/Research_Project-T111004/Morteza/GenomeIndex/STAR/GRCh38.p14.PRI.GENECODE.R48"
+Genome_fasta="/lustre/projects/Research_Project-T111004/Morteza/GenomeRef/GRCh38.p14.PRI.GENECODE.R48.fa"
+Genome_annotation="/lustre/projects/Research_Project-T111004/Morteza/GenomeRef/GRCh38.p14.PRI.GENECODE.R48.gff3"
 
 ######################################################################################################################
 
