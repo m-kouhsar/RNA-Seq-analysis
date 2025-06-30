@@ -52,7 +52,7 @@ do
     sample_name=$(echo $name| cut -d'/' -f $index)
     sample_name=$(echo ${sample_name%R1*.fastq.gz})
     temp_dir=${OutDir}/temp/${sample_name}
-	OutDir=${OutDir}/${sample_name}
+	OutDir1=${OutDir}/${sample_name}
 
     echo start sample $sample_name
     
@@ -60,7 +60,7 @@ do
          --quantMode GeneCounts \
          --genomeDir $GenomeIndexDir \
          --outSAMtype None \
-         --outFileNamePrefix ${OutDir} \
+         --outFileNamePrefix ${OutDir1} \
          --readFilesIn $R1 $R2 \
          --readFilesCommand zcat \
          --alignSJoverhangMin 8 \
