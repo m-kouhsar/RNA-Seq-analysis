@@ -52,7 +52,7 @@ do
     sample_name=$(echo $name| cut -d'/' -f $index)
     sample_name=$(echo ${sample_name%R1*.fastq.gz})
     temp_dir=${OutDir}/temp/${sample_name}
-	OutDir1=${OutDir}/${sample_name}
+	  OutDir1=${OutDir}/${sample_name}
 
     echo start sample $sample_name
     
@@ -73,6 +73,8 @@ do
          --outTmpDir $temp_dir \
 
 done
+
+rm -r -f ${OutDir}/temp
 
 echo Job finished on:
 date -u

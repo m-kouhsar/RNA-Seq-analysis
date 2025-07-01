@@ -26,7 +26,7 @@ do
     R2=${i/R1/R2}
     sample_name=$(echo $i| cut -d'/' -f 7)
     sample_name=$(echo ${sample_name%R1*.fastq.gz})
-    OutDir=${OutDir}/${sample_name}
+    OutDir1=${OutDir}/${sample_name}
     TempDir=${OutDir}/temp/${sample_name}
 
     #echo "Working on $sample_name ..."
@@ -35,7 +35,7 @@ do
          --quantMode GeneCounts \
          --genomeDir ${GenomeIndexDir} \
          --outSAMtype None \
-         --outFileNamePrefix ${OutDir}. \
+         --outFileNamePrefix ${OutDir1}. \
          --readFilesIn $R1 $R2 \
          --readFilesCommand zcat \
          --alignSJoverhangMin 8 \
@@ -48,3 +48,7 @@ do
          --outTmpDir $TempDir \
 
 done
+
+rm -r -f ${OutDir}/temp
+
+echo "All done!"
