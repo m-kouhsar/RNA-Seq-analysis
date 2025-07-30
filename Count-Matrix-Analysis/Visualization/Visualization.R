@@ -33,6 +33,6 @@ graphics.off()
 
 tiff(filename = paste0(OutPrefix , ".volcano.tif") , res = 300 , units = "in" , height = 8 , width = 8)
 
-EnhancedVolcano(toptable = results.table,lab = gene_col , x = logFC_col , y = pvalue_col , pCutoff = pvalue_cut)
+EnhancedVolcano(toptable = results.table,lab = gene_col , x = logFC_col , y = pvalue_col , pCutoff = pvalue_cut,title = Volcano.title)
 
 graphics.off()

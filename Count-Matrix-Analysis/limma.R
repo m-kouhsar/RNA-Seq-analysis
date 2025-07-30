@@ -124,7 +124,6 @@ if(runSVA){
   if(ncol(svs) < n.SV){
     n.SV = ncol(svs)
   }
-  OutPrefix = paste0(OutPrefix , ".SV",n.SV)
   
   var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV)))
   
@@ -162,13 +161,12 @@ for (i in 1:nrow(contrasts_)){
   SE = sqrt(fit.ebays$s2.post)*fit.ebays$stdev.unscaled
   index = match(rownames(result) , rownames(SE))
   result$SE = SE[index]
-  print(colnames(result))
   if(is.null(result)){
     result = as.data.frame(matrix(data = NA , nrow = 1 , ncol = 6))
   }
   
   colnames(result) = c("logFC" , "AveExpr", "t"   ,  "PValue" ,"adjPvalue.BH" , "B","SE")
-  result$adjPvalue.bnf <- p.adjust(result$P.Value , method = "bonferroni")
+  result$adjPvalue.bnf <- p.adjust(result$PValue , method = "bonferroni")
   result <- result[order(result$PValue, decreasing = F),]
   write.csv(result , file = paste0(out_name , ".csv"))
 }

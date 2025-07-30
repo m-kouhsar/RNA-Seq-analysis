@@ -123,7 +123,6 @@ if(runSVA){
   if(ncol(svs) < n.SV){
     n.SV = ncol(svs)
   }
-  out_name = paste0(out_name , ".SV",n.SV)
   
   var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV)))
   

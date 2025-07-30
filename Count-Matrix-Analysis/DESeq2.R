@@ -169,7 +169,7 @@ for (i in 1:nrow(contrasts_)){
   
   colnames(result.table) <- c("baseMean","logFC","lfcSE","stat","PValue","adjPvalue.BH")
   
-  result.table$adjPvalue.bnf <- p.adjust(result.table$pvalue , method = "bonferroni")
+  result.table$adjPvalue.bnf <- p.adjust(result.table$PValue , method = "bonferroni")
   result.table <- result.table[order(result.table$PValue, decreasing = F),]
   
   write.csv(result.table , file = paste0(out_name , ".csv"))
