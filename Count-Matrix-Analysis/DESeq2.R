@@ -1,25 +1,24 @@
-library(DESeq2)
-library(edgeR)
-library(stringr)
-library(sva)
+message("loading requireed libraries...")
+suppressMessages(suppressWarnings(library(DESeq2)))
+suppressMessages(suppressWarnings(library(edgeR)))
+suppressMessages(suppressWarnings(library(stringr)))
+suppressMessages(suppressWarnings(library(sva)))
 set.seed(12345)
 
 ####################################################################################################
-DEG.DESeq2 <- function(count.data , phenotype.data , trait , batches, p.adjust.method = "BH"){
+DEG.DESeq2 <- function(count.data , phenotype.data , trait , batches){
   
-  result.table <- NA
+  design_ <- as.formula(paste0("~",trait,"+",paste(batches , collapse = "+")))
   
-  design_ <- as.formula(paste0("~",paste(batches , collapse = "+"),"+",trait))
+  message("Running DEG analysis using DESeq function.\nDesign formula: ",design_)
+  
+  phenotype.data[,trait] = as.factor(phenotype.data[,trait])
   
   dds <- DESeq2::DESeqDataSetFromMatrix(countData = count.data , colData = phenotype.data , design = design_ )
   
   dds <- DESeq(dds)
   
-  result.table <- as.data.frame(results(dds,contrast = c(trait , unique(phenotype.data[,trait])[1:2])))
-  result.table$padj <- p.adjust(result.table$pvalue , method = p.adjust.method)
-  result.table <- result.table[order(result.table$pvalue, decreasing = F),]
-  
-  return(result.table)
+  return(dds)
 }
 
 ########################################################################
@@ -28,20 +27,30 @@ DEG.DESeq2 <- function(count.data , phenotype.data , trait , batches, p.adjust.m
 #
 ########################################################################
 
-setwd("C:/Users/mk693/OneDrive - University of Exeter/Desktop/2021/NIH/Data/miRNA-Seq/Sep2024")
-counts.file <- "Raw/BDR.miRNA.AD.C.Psy2.Count.txt"
-pheno.file <- "Raw/BDR.miRNA.AD.C.Psy2.Pheno.csv"
-var.trait <- "Trait"
-var.batch.num <- "Age,RIN"
-var.batch.fact <- "Sex,Plate"
-outliers = "BBN10205"
-logFC = round(log2(1.2) , digits = 2)
-Pvalue = 0.05
-P.adjust = 0.05
-p.adjust.method = "bonferroni"
-runSVA = F
-n.SV = 4
-OutPrefix <- "Results/BDR/BDR.miRNA.AD.C.Psy2.DESeq2"
+args = commandArgs(T)
+
+counts.file <- args[1]
+pheno.file <- args[2]
+var.trait <- args[3]
+var.batch.num <- args[4]
+var.batch.fact <- args[5]
+outliers <- args[6]
+runSVA <- args[7]
+n.SV <- args[8]
+OutPrefix <- args[9]
+
+cat("##########################################################################\n")
+message("Input arguments:")
+message("        Count matrix file: ",counts.file)
+message("        Phenotype file: ",pheno.file)
+message("        Trait variable: ",var.trait)
+message("        Numeric batches: ",var.batch.num)
+message("        Categorical batches: ",var.batch.fact)
+message("        Outlie samples: ",outliers)
+message("        Do you want to add sorrogate variables to the model? ",runSVA)
+message("        Number of sorrogate variables: ",n.SV)
+message("        Output files prefix: ",OutPrefix)
+cat("##########################################################################\n")
 
 ########################################################################
 #
@@ -49,14 +58,17 @@ OutPrefix <- "Results/BDR/BDR.miRNA.AD.C.Psy2.DESeq2"
 #
 ########################################################################
 
-counts <- read.table(counts.file , header = T , row.names = 1 , sep = "\t", stringsAsFactors = F)
+message("Reading input data...")
+
+counts <- read.table(counts.file , header = T , row.names = 1 , sep = "\t", stringsAsFactors = F, check.names = F)
 pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
 var.batch.num <- trimws(str_split_1(var.batch.num , pattern = ","))
 var.batch.fact <- trimws(str_split_1(var.batch.fact , pattern = ","))
 outliers <- trimws(str_split_1(outliers , pattern = ","))
+runSVA = ifelse(trimws(tolower(runSVA))=="yes",T ,F)
 
 if(!identical(colnames(counts) , rownames(pheno))){
-  warning("Row names in Phenotype data are not matched with column names in count data!")
+  warning("Row names in Phenotype data are not matched with column names in count data. Shared IDs will be considered.")
   index <- intersect(rownames(pheno) , colnames(counts))
   if(length(index)<2){
     stop("Phenotype data and counts data cannot be matched!")
@@ -66,6 +78,11 @@ if(!identical(colnames(counts) , rownames(pheno))){
   }
 }
 
+## centering and scaling numeric variables (DESeq2 suggestion)
+
+for(var_ in var.batch.num){
+  pheno[,var_] <- scale(pheno[,var_])[,1]
+}
 
 ########################################################################
 #
@@ -92,8 +109,10 @@ if(all(outliers != "")){
   counts <- counts[,!(colnames(counts) %in% outliers)]
   pheno <- pheno[!(rownames(pheno) %in% outliers),]
   
-  paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
+  #paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
 }
+
+
 
 for (var_ in var.batch.fact) {
   pheno[,var_] <- as.factor(pheno[,var_])
@@ -108,44 +127,50 @@ for (var_ in var.batch.num) {
 #          DEG analysis
 #
 ########################################################################
+OutPrefix = paste0(OutPrefix , ".DESeq2")
+
+if(runSVA){
+  message("Calculating sorrogate variables...")
+  mod0 <- model.matrix(~1,data=pheno)
+  design.sva <- as.formula(paste0("~",var.trait,"+",paste(c(var.batch.fact , var.batch.num ) , collapse = "+")))
+  message("SVA model:\n",design.sva)
+  mod1 <- model.matrix(design.sva , data = pheno)
+  
+  svs = sva(dat = as.matrix(counts),mod = mod1 , mod0 = mod0)$sv
+  
+  colnames(svs) <- paste0("SV", c(1:ncol(svs)))
+  
+  pheno <- cbind.data.frame(pheno , svs)
+  
+  if(ncol(svs) < n.SV){
+    n.SV = ncol(svs)
+  }
+  
+  var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV)))
+  
+  OutPrefix = paste0(OutPrefix , ".SV",n.SV)
+}else{
+  
+  var.batch.all <- c(var.batch.fact , var.batch.num )
+  
+}
+
+dds.DEG <- DEG.DESeq2(count.data = counts , phenotype.data = pheno,trait = var.trait , batches = var.batch.all)
 
 groups <- unique(pheno[,var.trait])
 contrasts_  <- t(combn(groups, 2))
 
+dir.create(path = dirname(OutPrefix),showWarnings = F,recursive = T)
 for (i in 1:nrow(contrasts_)){
   
-  pheno.1 <- pheno[pheno$Trait %in% contrasts_[i,],]
-  counts.1 <- counts[,pheno$Trait %in% contrasts_[i,]]
-  out_name = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."),".logFC.",logFC,
-                    ".Pval.",Pvalue,".",p.adjust.method,".",P.adjust)
-  n.SV1 = n.SV
-  if(runSVA){
-    mod0 <- model.matrix(~1,data=pheno.1)
-    design_ <- as.formula(paste0("~",paste(c(var.batch.fact , var.batch.num ) , collapse = "+"),"+",var.trait))
-    mod1 <- model.matrix(design_ , data = pheno.1)
-    
-    svs = sva(dat = as.matrix(counts.1),mod = mod1 , mod0 = mod0)$sv
-    
-    colnames(svs) <- paste0("SV", c(1:ncol(svs)))
-    
-    pheno.1 <- cbind.data.frame(pheno.1 , svs)
-    
-    if(ncol(svs) < n.SV1){
-      n.SV1 = ncol(svs)
-    }
-    
-    var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV1)))
-    result <- as.data.frame(DEG.DESeq2(count.data = counts.1 , phenotype.data = pheno.1,trait = var.trait , 
-                         batches = var.batch.all,p.adjust.method = p.adjust.method))
-    out_name = paste0(out_name , ".SV",n.SV1)
-  }else{
-    
-    var.batch.all <- c(var.batch.fact , var.batch.num )
-    result <- DEG.DESeq2(count.data = counts.1 , phenotype.data = pheno.1,trait = var.trait , 
-                         batches = var.batch.all,p.adjust.method = p.adjust.method)
-    
-  }
+  out_name = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."))
   
-  result.filter <- result[(abs(result$log2FoldChange) > logFC ) & (result$pvalue < Pvalue) & (result$padj < P.adjust),]
-  write.csv(result.filter , file = paste0(out_name , ".csv"))
+  result.table <- as.data.frame(results(dds.DEG,contrast = c(var.trait , contrasts_[i,])))
+  
+  colnames(result.table) <- c("baseMean","logFC","lfcSE","stat","PValue","adjPvalue.BH")
+  
+  result.table$adjPvalue.bnf <- p.adjust(result.table$pvalue , method = "bonferroni")
+  result.table <- result.table[order(result.table$PValue, decreasing = F),]
+  
+  write.csv(result.table , file = paste0(out_name , ".csv"))
 }

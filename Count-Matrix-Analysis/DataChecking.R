@@ -1,25 +1,40 @@
+message("loading requiered packages...")
+suppressWarnings(suppressMessages(library(ggplot2)))
+suppressWarnings(suppressMessages(library(DESeq2)))
+suppressWarnings(suppressMessages(library(WGCNA)))
+suppressWarnings(suppressMessages(library(stringr)))
 
-library(ggplot2)
-library(DESeq2)
-library(WGCNA)
-library(stringr)
+args = commandArgs(T)
 
-setwd("./")
-counts.file <- "Raw/Count.txt"
-pheno.file <- "Raw/Pheno.csv"
-var.trait <- "Trait"
-var.fact <- "Sex,Plate"
-var.num <- "Age,RIN"
-OutPrefix <- "Results/Project01"
+counts.file <- args[1]
+pheno.file <- args[2]
+var.trait <- args[3]
+var.fact <- args[4]
+var.num <- args[5]
+OutPrefix <- args[6]
 
+
+message("Input arguments:")
+message("        Count matrix: ", counts.file)
+message("        Phenotype file: ", pheno.file)
+message("        Trait variable: ", var.trait)
+message("        Numeric variables: ", var.num)
+message("        Categorical variables: ", var.fact)
+message("        Output files prefix: ", OutPrefix)
+cat("\n")
 ########################################################################
 #
 #          Reading the data
 #
 ########################################################################
-
-counts <- read.table(file = counts.file, stringsAsFactors = F,header = T, row.names = 1)
+message("Reading the data ...")
+counts <- read.table(file = counts.file, stringsAsFactors = F,header = T, row.names = 1,check.names=F)
 pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
+
+if(!identical(colnames(counts) , rownames(pheno))){
+  stop("Colnames in the count matrix are not equal to the rownames in the phenotype file!")
+}
+
 var.fact <- trimws(str_split_1(var.fact , pattern = ","))
 var.num <- trimws(str_split_1(var.num , pattern = ","))
 
@@ -34,17 +49,14 @@ for (i in 1:length(var.num)) {
   pheno[,var.num[i]] <- as.numeric(pheno[,var.num[i]])
 }
 
-
-identical(colnames(counts) , rownames(pheno))
-
 ########################################################################
 #
 #          Filtering low count genes
 #
 ########################################################################
-
-keep <- edgeR::filterByExpr(counts,group = pheno$Trait,min.count = 5)
-table(keep)
+message("filtering low count genes...")
+keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 10)
+message("Low count genes: ",sum(keep) , " out of ",nrow(counts))
 counts <- counts[keep,]
 
 ########################################################################
@@ -52,10 +64,14 @@ counts <- counts[keep,]
 #          Checking for possible outliers and batch effects
 #
 ########################################################################
-#counts.logCPM <- edgeR::cpm(counts , log = T)
+
+message("Normalizing gene counts uisng vst method in DESeq2...")
 counts.vst <- DESeq2::varianceStabilizingTransformation(as.matrix(counts) , blind = T, fitType = "parametric")
 
+message("Calculating PCs...")
 pcs <- prcomp(t(counts.vst), scale. = T , center = T)
+
+message("Generating plots...")
 plot.data <- cbind.data.frame(pheno , pcs$x[,c(1,2)],MeanExpr = colMeans(counts.vst , na.rm = T))
 plot.data$PC.PVar <- round(summary(pcs)$importance[2,]*100,digits = 2)
 
