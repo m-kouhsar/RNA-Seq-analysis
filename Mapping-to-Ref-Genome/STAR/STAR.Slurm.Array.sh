@@ -74,7 +74,5 @@ do
 
 done
 
-rm -r -f ${OutDir}/temp
-
 echo Job finished on:
 date -u
