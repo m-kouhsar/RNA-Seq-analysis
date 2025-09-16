@@ -27,7 +27,7 @@ read.star.log <- function(log_file){
 
 args <- commandArgs(T)
 
-STAR.results.dir <- args[1] # The directory contains mirdeep2 results
+STAR.results.dir <- args[1]    # The directory contains STAR results
 OutPrefix <- args[2]           # This script Output files prefix
 
 if(is.na(OutPrefix)){
@@ -110,5 +110,6 @@ write.table(counts.unstarnded.merged , file = paste0(OutPrefix,"STAR.count.unstr
 write.table(counts.forward.merged , file = paste0(OutPrefix,"STAR.count.forward.tsv"),quote = F , sep = "\t" , row.names = T , col.names = T)
 write.table(counts.reverse.merged , file = paste0(OutPrefix,"STAR.count.reverse.tsv"),quote = F , sep = "\t" , row.names = T , col.names = T)
 write.csv(logs.merged , file = paste0(OutPrefix,"STAR.report.csv"),row.names = F)
+
 
 message("ALL DONE!")
