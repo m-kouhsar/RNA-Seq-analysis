@@ -1,46 +1,64 @@
+message("Loading requiered packages...")
 library(bacon)
 library(qqman)
-
+############################################################
 calculate_lambda <- function(pvals) {
   pvals <- pvals[!is.na(pvals) & pvals > 0 & pvals < 1]
   chisq <- qchisq(1 - pvals, df = 1)
   lambda <- median(chisq) / qchisq(0.5, df = 1)
   return(lambda)
 }
+##########################################################
+args <- commandArgs(T)
+sumstat_file <- trimws(args[1])
+effectsizes_col <- trimws(args[2])
+standarderrors_col <- trimws(args[3])
+OutPrefix <- trimws(args[4])
 
+message("Input arguments:")
+message("        Summary statistics file: ",sumstat_file)
+message("        Effect Size column: ",effectsizes_col)
+message("        Standar Errors column: ",standarderrors_col)
+message("        Output files Prefix: ",OutPrefix)
 
-sumstat.all_file <- "Results/UKBBN.PC10.sleuth.DEG.tsv"
-OutPrefix <- "Results/bacon/UKBBN.lnc.PC10"
-Plot_title <- "UKBBN"
+############################################################
+message("Reading input data...")
 
-dir.create(dirname(OutPrefix), recursive = T , showWarnings = F)
+sumstat <- read.table(sumstat_file , stringsAsFactors = F , header = T)
 
-sumstat.all <- read.table(sumstat.all_file , stringsAsFactors = F , header = T)
-sumstat.all <- sumstat.all[!is.na(sumstat.all$se_b),]
-sumstat.lnc <- sumstat.all[sumstat.all$biotype == "lncRNA" , ]
+if(!(effectsizes_col %in% colnames(sumstat))){
+  stop("There is no column named ", effectsizes_col, " in summary statistic file.")
+}
+if(!(standarderrors_col %in% colnames(sumstat))){
+  stop("There is no column named ", standarderrors_col, " in summary statistic file.")
+}
 
-bc.lnc = bacon(effectsizes = sumstat.lnc$b , standarderrors = sumstat.lnc$se_b)
+sumstat <- sumstat[!is.na(sumstat[,standarderrors_col]),]
 
-sumstat.lnc$bacon_test_stat = as.numeric(bacon::tstat(bc.lnc , corrected = T))
-sumstat.lnc$bacon_pval = as.numeric(bacon::pval(bc.lnc , corrected = T))
+message("Applying bacon...")
+bc_obj = bacon(effectsizes = sumstat[,effectsizes_col] , standarderrors = sumstat[,standarderrors_col])
 
+sumstat$bacon_test_stat = as.numeric(bacon::tstat(bc_obj , corrected = T))
+sumstat$bacon_pval = as.numeric(bacon::pval(bc_obj , corrected = T))
+
+message("Saving results...")
 pdf(file = paste0(OutPrefix , ".bacon.pdf"))
 
-qq(sumstat.lnc$pval, main=paste0(Plot_title , " (lncRNAs, uncorrected data)"))
+qq(sumstat$pval, main="QQ Plot - Uncorrected Data")
 text(x = 0.5,y = (par("usr")[4]-0.2),
-     label = bquote(lambda == .(round(calculate_lambda(sumstat.lnc$pval), 2))),
+     label = bquote(lambda == .(round(calculate_lambda(sumstat$pval), 2))),
      adj = c(0, 1),
      cex = 1)
 
-qq(sumstat.lnc$bacon_pval, main=paste0(Plot_title , " (lncRNAs, corrected with bacon)"))
+qq(sumstat$bacon_pval, main="QQ Plot - Corrected with Bacon")
 text(x = 0.5,y = (par("usr")[4]-0.2),
-     label = bquote(lambda == .(round(calculate_lambda(sumstat.lnc$bacon_pval), 2))),
+     label = bquote(lambda == .(round(calculate_lambda(sumstat$bacon_pval), 2))),
      adj = c(0, 1),
      cex = 1)
 
 graphics.off()
 
-save(bc.lnc ,sumstat.all , sumstat.lnc , file = paste0(OutPrefix , ".bacon.rdat") )
+write.csv(sumstat , file = paste0(OutPrefix , ".bacon.csv") )
 
 
 
