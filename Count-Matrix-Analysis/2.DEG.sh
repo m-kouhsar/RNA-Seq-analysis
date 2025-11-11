@@ -19,6 +19,8 @@ trait_var="Group"
 numeric_batch="Age,RIN"
 factor_batch="Sex"
 outliers="16_A008"
+gFilter_min_count=5
+gFilter_min_prop=0.75
 runSVA=no
 nSV=4
 OutPrefix="./Results/Ascribed"
@@ -28,12 +30,12 @@ ScriptDir="/lustre/projects/Research_Project-T111004/Morteza/github/RNA_Seq_anal
 ########################################################################
 
 if [[ "$method" == "DESeq2" ]]; then
-    Rscript $ScriptDir/DESeq2.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $runSVA $nSV $OutPrefix
+    Rscript $ScriptDir/DESeq2.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $gFilter_min_count $gFilter_min_prop $runSVA $nSV $OutPrefix
 fi
 if [[ "$method" == "edgeR" ]]; then
-    Rscript $ScriptDir/edgeR.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $runSVA $nSV $OutPrefix
+    Rscript $ScriptDir/edgeR.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $gFilter_min_count $gFilter_min_prop $runSVA $nSV $OutPrefix
 fi
 if [[ "$method" == "limma" ]]; then
-    Rscript $ScriptDir/limma.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $runSVA $nSV $OutPrefix
+    Rscript $ScriptDir/limma.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $gFilter_min_count $gFilter_min_prop $runSVA $nSV $OutPrefix
 fi
 echo "All done!"

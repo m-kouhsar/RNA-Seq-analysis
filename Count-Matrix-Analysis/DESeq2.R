@@ -35,9 +35,11 @@ var.trait <- args[3]
 var.batch.num <- args[4]
 var.batch.fact <- args[5]
 outliers <- args[6]
-runSVA <- args[7]
-n.SV <- args[8]
-OutPrefix <- args[9]
+gFilter.min.count <- as.numeric(trimws(args[7]))
+gFilter.min.prop <- as.numeric(trimws(args[8]))
+runSVA <- args[9]
+n.SV <- args[10]
+OutPrefix <- args[11]
 
 cat("##########################################################################\n")
 message("Input arguments:")
@@ -89,9 +91,10 @@ for(var_ in var.batch.num){
 #          Filtering low counts
 #
 ########################################################################
-message("Filtering low count genes...")
-keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 10)
-message(sum(keep), " genes remained.")
+message("filtering low count genes...")
+message("Genes that don't have minimum count of ",gFilter.min.count, " in at least ",(gFilter.min.prop*100) , "% of the samples will be removed.")
+keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 5, min.prop = 0.75)
+message(sum(!keep),"/",nrow(counts)," genes removed. Remaining genes:", sum(keep))
 counts <- counts[keep,]
 
 ########################################################################
@@ -171,6 +174,6 @@ for (i in 1:nrow(contrasts_)){
   
   result.table$adjPvalue.bnf <- p.adjust(result.table$PValue , method = "bonferroni")
   result.table <- result.table[order(result.table$PValue, decreasing = F),]
-  
-  write.csv(result.table , file = paste0(out_name , ".csv"))
+  result.table <- cbind.data.frame(Gene=rownames(result.table) , result.table)
+  write.csv(result.table , file = paste0(out_name , ".csv") , row.names = F)
 }
