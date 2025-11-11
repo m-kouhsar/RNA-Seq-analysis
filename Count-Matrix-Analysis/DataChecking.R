@@ -121,7 +121,7 @@ message("        Categorical variables: ", var.fact)
 message("        Normalization method: ", normalize.method)
 message("        Library size threshold: ", lib.size.threshold)
 message("        Minimum count threshold for gene filtering: ", gFilter.min.count)
-message("        Minimum proportion of the samples for gene filtering: ", gFilter.min.count)
+message("        Minimum proportion of the samples for gene filtering: ", gFilter.min.prop)
 message("        Output files prefix: ", OutPrefix)
 cat("\n")
 ########################################################################
