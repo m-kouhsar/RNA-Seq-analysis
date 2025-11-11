@@ -11,16 +11,20 @@
 #SBATCH --output=%x.%j.out
 #########################################################################
 
-counts_file="./Raw/Project_11556.STAR.count.reverse.tsv"
-pheno_file="./Raw/Pheno_Ascribed.csv"
-trait_vars="Trait"
-factor_vars="Sex,Plate"
-numeric_vars="Age,RIN"
-OutPrefix="./Results/Ascribe_Study"
+counts_file="./Raw/NIH/NIH_miRNA.mirdeep2.count.tsv"
+pheno_file="./NIH/NIH.Phenotype.csv"
+trait_var="Phenotype"
+factor_vars="Sex,RINcat,PMICat,Plate"
+numeric_vars="Age"
+normalize_method="cpm"
+lib_size_threshold="1e+6"
+gFilter_min_count=5
+gFilter_min_prop=0.75
+OutPrefix="Results/NIH"
 
-ScriptDir="./RNA_Seq_analysis/Count-Matrix-Analysis/"
+ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analysis/Count-Matrix-Analysis"
 ##########################################################################
 
-Rscript $ScriptDir/DataChecking.R $counts_file $pheno_file $trait_vars $factor_vars $numeric_vars $OutPrefix
+Rscript $ScriptDir/DataChecking.R $counts_file $pheno_file $trait_var $factor_vars $numeric_vars $normalize_method $lib_size_threshold $gFilter_min_count $gFilter_min_prop $OutPrefix
 
 echo "All done!"
