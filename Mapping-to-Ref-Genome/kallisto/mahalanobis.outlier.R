@@ -21,7 +21,8 @@ mahalanobis.outlier <- function(Data , method = "pca", plot.title=NA , tsne.seed
     pc.importance <- summary(pc)$importance[2,]
     Data.2D <- as.data.frame(pc$x)
   }
-  
+  Data.2D[,1] <- scale(Data.2D[,1] , center = T , scale = T)
+  Data.2D[,2] <- scale(Data.2D[,2] , center = T , scale = T)
   center_ <- colMeans(Data.2D)
   cov_ <- cov(Data.2D)
   
