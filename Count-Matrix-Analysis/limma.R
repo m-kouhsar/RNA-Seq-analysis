@@ -144,7 +144,6 @@ colnames(design.matrix)[1:length(groups)] <- groups
 
 dge.list <- DGEList(counts = counts,samples = pheno , group = pheno[,var.trait])
 dge.list <- calcNormFactors(dge.list)
-dge.list <- estimateDisp(dge.list , design = design.matrix , robust = T)
 
 fit.voom <- voom(dge.list , design = design.matrix , plot = F)
 fit.lm <- lmFit(fit.voom , design = design.matrix)
