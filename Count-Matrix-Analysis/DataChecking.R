@@ -219,7 +219,7 @@ plot_data$PC2_z <- scale(PCs$PC2)
 plot_data$Outliers.PC.ZScore <- (abs(plot_data$PC1_z) > 3 | abs(plot_data$PC2_z) > 3)
 
 plot_data$AveExpr <- colMeans(counts.norm , na.rm = T)
-PC.PVar <- round(summary(pcs_obj)$importance[2,1:2]*100,digits = 2)
+PC.PVar <- round(summary(pcs_obj)$importance[2,1:10]*100,digits = 2)
 
 all_var = c(var.trait , var.fact , var.num)
 cor_ <- matrix(data = NA,nrow =10,ncol = length(all_var) )
@@ -257,7 +257,7 @@ pdf(file = paste0(OutPrefix , ".PCA.pdf"),width = 10,height = 10)
 par(mar = c(12, 8,3, 3))
 labeledHeatmap(Matrix = cor_,
                xLabels = colnames(cor_),
-               yLabels = paste0(rownames(cor_),"(",plot_data$PC.PVar[1:10],"%)"),
+               yLabels = paste0(rownames(cor_),"(",PC.PVar[1:10],"%)"),
                ySymbols = rownames(cor_),
                colorLabels = FALSE,
                colors = blueWhiteRed(50),
