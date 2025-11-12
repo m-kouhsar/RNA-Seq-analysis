@@ -13,17 +13,17 @@ set.seed(12345)
 
 args = commandArgs(T)
 
-counts.file <- args[1]
-pheno.file <- args[2]
-var.trait <- args[3]
+counts.file <- trimws(args[1])
+pheno.file <- trimws(args[2])
+var.trait <- trimws(args[3])
 var.batch.num <- args[4]
 var.batch.fact <- args[5]
 outliers <- args[6]
 gFilter.min.count <- as.numeric(trimws(args[7]))
 gFilter.min.prop <- as.numeric(trimws(args[8]))
-runSVA <- args[9]
-n.SV <- args[10]
-OutPrefix <- args[11]
+n.SV <- as.numeric(trimws(args[9]))
+n.PC <- as.numeric(trimws(args[10]))
+OutPrefix <- trimws(args[11])
 
 cat("##########################################################################\n")
 message("Input arguments:")
@@ -35,8 +35,8 @@ message("        Categorical batches: ",var.batch.fact)
 message("        Outlie samples: ",outliers)
 message("        Minimum count threshold for gene filtering: ", gFilter.min.count)
 message("        Minimum proportion of the samples for gene filtering: ", gFilter.min.prop)
-message("        Do you want to add sorrogate variables to the model? ",runSVA)
-message("        Number of sorrogate variables: ",n.SV)
+message("        Number of Sorrogate Variables added to the model: ",n.SV)
+message("        Number of Principal Components added to the model: ",n.PC)
 message("        Output files prefix: ",OutPrefix)
 cat("##########################################################################\n")
 
@@ -53,7 +53,6 @@ pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
 var.batch.num <- trimws(str_split_1(var.batch.num , pattern = ","))
 var.batch.fact <- trimws(str_split_1(var.batch.fact , pattern = ","))
 outliers <- trimws(str_split_1(outliers , pattern = ","))
-runSVA = ifelse(trimws(tolower(runSVA))=="yes",T ,F)
 
 if(!identical(colnames(counts) , rownames(pheno))){
   warning("Row names in Phenotype data are not matched with column names in count data. Shared IDs will be considered.")
@@ -111,15 +110,15 @@ for (var_ in var.batch.num) {
 ########################################################################
 
 OutPrefix <- paste0(OutPrefix , ".edgeR")
-
-if(runSVA){
+var.batch.all <- c(var.batch.fact , var.batch.num)
+if(n.SV > 0){
   message("Calculating surrogate variables...")
   mod0 <- model.matrix(~1,data=pheno)
   design.sva <- as.formula(paste0("~",var.trait,"+",paste(c(var.batch.fact , var.batch.num ) , collapse = "+")))
   message("SVA model:\n",design.sva)
   mod1 <- model.matrix(design.sva , data = pheno)
-  
-  svs = sva(dat = as.matrix(counts),mod = mod1 , mod0 = mod0)$sv
+  counts.norm <- edgeR::cpm(counts , log = T)
+  svs = sva(dat = as.matrix(counts.norm),mod = mod1 , mod0 = mod0)$sv
   
   colnames(svs) <- paste0("SV", c(1:ncol(svs)))
   
@@ -129,12 +128,24 @@ if(runSVA){
     n.SV = ncol(svs)
   }
   
-  var.batch.all <- c(var.batch.fact , var.batch.num , paste0("SV", c(1:n.SV)))
+  var.batch.all <- c(var.batch.all , paste0("SV", c(1:n.SV)))
   
   OutPrefix = paste0(OutPrefix , ".SV",n.SV)
   
-}else{
-  var.batch.all <- c(var.batch.fact , var.batch.num )
+}
+
+if(n.PC > 0){
+  message("Calculate the Principal Components...")
+  counts.norm <- edgeR::cpm(counts , log = T)
+  
+  pca <- prcomp(t(tpm.norm), rank. = PCs)
+  PCs <- pca$x
+  PCs <- as.data.frame(scale(PCs))
+  pheno <- cbind.data.frame(pheno , PCs)
+  
+  var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.SV)))
+  
+  OutPrefix = paste0(OutPrefix , ".PC",n.SV)
 }
 
 message("Running DEG analysis using glmFit function in edgeR...")
