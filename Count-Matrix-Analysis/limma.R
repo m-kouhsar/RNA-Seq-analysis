@@ -59,8 +59,13 @@ message("Reading input data...")
 
 counts <- read.table(counts.file , header = T , row.names = 1 , sep = "\t", stringsAsFactors = F, check.names = F)
 pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
+
 var.batch.num <- trimws(str_split_1(var.batch.num , pattern = ","))
+var.batch.num <- var.batch.num[nchar(var.batch.num) > 0]
+
 var.batch.fact <- trimws(str_split_1(var.batch.fact , pattern = ","))
+var.batch.fact <- var.batch.num[nchar(var.batch.fact) > 0]
+
 outliers <- trimws(str_split_1(outliers , pattern = ","))
 
 if(!identical(colnames(counts) , rownames(pheno))){
@@ -104,13 +109,22 @@ if(all(outliers != "")){
   #paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
 }
 
-for (var_ in var.batch.fact) {
-  pheno[,var_] <- as.factor(pheno[,var_])
+var.all = var.trait
+if(length(var.batch.fact) > 0){
+  for (var_ in var.batch.fact) {
+    print(var_)
+    pheno[,var_] <- as.factor(pheno[,var_])
+  }
+  var.all = c(var.all , var.batch.fact)
 }
 
-for (var_ in var.batch.num) {
-  pheno[,var_] <- as.numeric(pheno[,var_])
+if(length(var.batch.num) > 0){
+  for (var_ in var.batch.num) {
+    pheno[,var_] <- as.numeric(pheno[,var_])
+  }
+  var.all = c(var.all , var.batch.num)
 }
+
 
 ########################################################################
 #
@@ -119,12 +133,7 @@ for (var_ in var.batch.num) {
 ########################################################################
 
 OutPrefix <- paste0(OutPrefix , ".limma")
-var.batch.all <- c(var.batch.fact , var.batch.num)
-for (var_ in var.batch.fact) {
-  message("Variable: ", var_)
-  message("Number of unique levels: ", length(unique(pheno[, var_])))
-  print(table(pheno[, var_]))
-}
+
 if(n.SV > 0){
   message("Calculating sorrogate variables...")
   mod0 <- model.matrix(~1,data=pheno)
@@ -145,7 +154,7 @@ if(n.SV > 0){
     n.SV = ncol(svs)
   }
   
-  var.batch.all <- c(var.batch.all , paste0("SV", c(1:n.SV)))
+  var.all <- c(var.all , paste0("SV", c(1:n.SV)))
   
   OutPrefix = paste0(OutPrefix , ".SV",n.SV)
 }
@@ -159,14 +168,14 @@ if(n.PC > 0){
   PCs <- as.data.frame(scale(PCs))
   pheno <- cbind.data.frame(pheno , PCs)
   
-  var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.PC)))
+  var.all <- c(var.all , paste0("PC", c(1:n.PC)))
   
   OutPrefix = paste0(OutPrefix , ".PC",n.PC)
 }
 
 message("Running DEG analysis using voom and lmfit functions in limma...")
 
-design.formula = as.formula(paste0("~0+",var.trait,"+",paste(var.batch.all , collapse = "+")))
+design.formula = as.formula(paste0("~0+",paste(var.all , collapse = "+")))
 message("Linea regression model:\n",design.formula)
 
 design.matrix = model.matrix(design.formula , data = pheno)

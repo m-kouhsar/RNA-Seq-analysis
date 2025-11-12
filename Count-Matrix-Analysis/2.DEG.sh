@@ -30,12 +30,12 @@ ScriptDir="/lustre/projects/Research_Project-T111004/Morteza/github/RNA_Seq_anal
 ########################################################################
 
 if [[ "$method" == "DESeq2" ]]; then
-    Rscript $ScriptDir/DESeq2.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $gFilter_min_count $gFilter_min_prop $nSV $nPC $OutPrefix
+    Rscript "$ScriptDir/DESeq2.R" "$counts_file" "$pheno_file" "$trait_var" "$numeric_batch" "$factor_batch" "$outliers" "$gFilter_min_count" "$gFilter_min_prop" "$nSV" "$nPC" "$OutPrefix"
 fi
 if [[ "$method" == "edgeR" ]]; then
-    Rscript $ScriptDir/edgeR.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $gFilter_min_count $gFilter_min_prop $nSV $nPC $OutPrefix
+    Rscript "$ScriptDir/edgeR.R" "$counts_file" "$pheno_file" "$trait_var" "$numeric_batch" "$factor_batch" "$outliers" "$gFilter_min_count" "$gFilter_min_prop" "$nSV" "$nPC" "$OutPrefix"
 fi
 if [[ "$method" == "limma" ]]; then
-    Rscript $ScriptDir/limma.R $counts_file $pheno_file $trait_var $numeric_batch $factor_batch $outliers $gFilter_min_count $gFilter_min_prop $nSV $nPC $OutPrefix
+    Rscript "$ScriptDir/limma.R" "$counts_file" "$pheno_file" "$trait_var" "$numeric_batch" "$factor_batch" "$outliers" "$gFilter_min_count" "$gFilter_min_prop" "$nSV" "$nPC" "$OutPrefix"
 fi
 echo "All done!"
