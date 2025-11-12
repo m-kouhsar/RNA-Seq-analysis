@@ -55,6 +55,9 @@ cat("##########################################################################\
 message("Reading input data...")
 
 counts <- read.table(counts.file , header = T , row.names = 1 , sep = "\t", stringsAsFactors = F, check.names = F)
+counts <- round(counts)
+#Assume that the count data are integer. If it is not, you should use textimport. If you can't use teximport. you may have to round the values. 
+
 pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
 
 var.batch.num <- trimws(str_split_1(var.batch.num , pattern = ","))

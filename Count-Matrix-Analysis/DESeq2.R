@@ -17,7 +17,8 @@ DEG.DESeq2 <- function(count.data , phenotype.data , variables){
   design_ <- as.formula(paste0("~",paste(variables , collapse = "+")))
   
   message("Running DEG analysis using DESeq function.\nDesign formula: ",design_)
-  
+  count.data = as.matrix(count.data)
+  count.data = round(count.data)
   dds <- DESeq2::DESeqDataSetFromMatrix(countData = count.data , colData = phenotype.data , design = design_ )
   
   dds <- DESeq(dds)
@@ -69,6 +70,9 @@ cat("##########################################################################\
 message("Reading input data...")
 
 counts <- read.table(counts.file , header = T , row.names = 1 , sep = "\t", stringsAsFactors = F, check.names = F)
+counts <- round(counts) 
+#Assume that the count data are integer. If it is not, you should use textimport. If you can't use teximport. you may have to round the values. 
+
 pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
 
 var.batch.num <- trimws(str_split_1(var.batch.num , pattern = ","))
@@ -185,7 +189,7 @@ if(n.PC > 0){
 
 dds.DEG <- DEG.DESeq2(count.data = counts , phenotype.data = pheno,variables = var.all)
 
-groups <- unique(pheno[,var.trait])
+groups <- unique(as.character(pheno[,var.trait]))
 contrasts_  <- t(combn(groups, 2))
 
 dir.create(path = dirname(OutPrefix),showWarnings = F,recursive = T)
