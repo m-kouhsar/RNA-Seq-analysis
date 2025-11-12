@@ -71,7 +71,7 @@ message("Reading input data...")
 
 counts <- read.table(counts.file , header = T , row.names = 1 , sep = "\t", stringsAsFactors = F, check.names = F)
 counts <- round(counts) 
-#Assume that the count data are integer. If it is not, you should use textimport. If you can't use teximport. you may have to round the values. 
+#Assume that the count data are integer. If it is not, you should use textimport. If you can't use teximport. you may have to round the values or use limma instead. 
 
 pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
 
