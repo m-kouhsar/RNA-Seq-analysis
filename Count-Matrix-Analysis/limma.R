@@ -106,7 +106,7 @@ if(all(outliers != "")){
   counts <- counts[,!(colnames(counts) %in% outliers)]
   pheno <- pheno[!(rownames(pheno) %in% outliers),]
   
-  paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
+  #paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
 }
 
 var.all = var.trait
