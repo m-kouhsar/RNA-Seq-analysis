@@ -94,7 +94,7 @@ for(var_ in var.batch.num){
 ########################################################################
 message("filtering low count genes...")
 message("Genes that don't have minimum count of ",gFilter.min.count, " in at least ",(gFilter.min.prop*100) , "% of the samples will be removed.")
-keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 5, min.prop = 0.75)
+keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = gFilter.min.count, min.prop = gFilter.min.prop)
 message(sum(!keep),"/",nrow(counts)," genes removed. Remaining genes:", sum(keep))
 counts <- counts[keep,]
 
@@ -136,7 +136,7 @@ var.batch.all <- c(var.batch.fact , var.batch.num)
 if(n.SV > 0){
   message("Calculating sorrogate variables...")
   mod0 <- model.matrix(~1,data=pheno)
-  design.sva <- as.formula(paste0("~",var.trait,"+",paste(c(var.batch.fact , var.batch.num ) , collapse = "+")))
+  design.sva <- as.formula(paste0("~",var.trait,"+",paste(var.batch.all , collapse = "+")))
   message("SVA model:\n",design.sva)
   mod1 <- model.matrix(design.sva , data = pheno)
   counts.norm <- edgeR::cpm(counts , log = T)
