@@ -64,7 +64,7 @@ var.batch.num <- trimws(str_split_1(var.batch.num , pattern = ","))
 var.batch.num <- var.batch.num[nchar(var.batch.num) > 0]
 
 var.batch.fact <- trimws(str_split_1(var.batch.fact , pattern = ","))
-var.batch.fact <- var.batch.num[nchar(var.batch.fact) > 0]
+var.batch.fact <- var.batch.fact[nchar(var.batch.fact) > 0]
 
 outliers <- trimws(str_split_1(outliers , pattern = ","))
 
@@ -93,7 +93,7 @@ counts <- counts[keep,]
 
 ########################################################################
 #
-#          Removing outliers
+#          Removing outlier samples
 #
 ########################################################################
 
@@ -106,13 +106,13 @@ if(all(outliers != "")){
   counts <- counts[,!(colnames(counts) %in% outliers)]
   pheno <- pheno[!(rownames(pheno) %in% outliers),]
   
-  #paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
+  paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
 }
 
 var.all = var.trait
+pheno[,var.trait] <- as.factor(pheno[,var.trait])
 if(length(var.batch.fact) > 0){
   for (var_ in var.batch.fact) {
-    print(var_)
     pheno[,var_] <- as.factor(pheno[,var_])
   }
   var.all = c(var.all , var.batch.fact)
@@ -137,7 +137,7 @@ OutPrefix <- paste0(OutPrefix , ".limma")
 if(n.SV > 0){
   message("Calculating sorrogate variables...")
   mod0 <- model.matrix(~1,data=pheno)
-  design.sva <- as.formula(paste0("~",var.trait,"+",paste(var.batch.all , collapse = "+")))
+  design.sva <- as.formula(paste0("~",paste(var.all , collapse = "+")))
   message("SVA model:\n",design.sva)
   mod1 <- model.matrix(design.sva , data = pheno)
   

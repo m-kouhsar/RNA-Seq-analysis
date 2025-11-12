@@ -12,13 +12,11 @@ calculate_lambda <- function(pvals) {
   return(lambda)
 }
 ####################################################################################################
-DEG.DESeq2 <- function(count.data , phenotype.data , trait , batches){
+DEG.DESeq2 <- function(count.data , phenotype.data , variables){
   
-  design_ <- as.formula(paste0("~",trait,"+",paste(batches , collapse = "+")))
+  design_ <- as.formula(paste0("~",paste(variables , collapse = "+")))
   
   message("Running DEG analysis using DESeq function.\nDesign formula: ",design_)
-  
-  phenotype.data[,trait] = as.factor(phenotype.data[,trait])
   
   dds <- DESeq2::DESeqDataSetFromMatrix(countData = count.data , colData = phenotype.data , design = design_ )
   
@@ -72,8 +70,13 @@ message("Reading input data...")
 
 counts <- read.table(counts.file , header = T , row.names = 1 , sep = "\t", stringsAsFactors = F, check.names = F)
 pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
+
 var.batch.num <- trimws(str_split_1(var.batch.num , pattern = ","))
+var.batch.num <- var.batch.num[nchar(var.batch.num) > 0]
+
 var.batch.fact <- trimws(str_split_1(var.batch.fact , pattern = ","))
+var.batch.fact <- var.batch.fact[nchar(var.batch.fact) > 0]
+
 outliers <- trimws(str_split_1(outliers , pattern = ","))
 
 if(!identical(colnames(counts) , rownames(pheno))){
@@ -85,12 +88,6 @@ if(!identical(colnames(counts) , rownames(pheno))){
     pheno <- pheno[index , ]
     counts <- counts[, index]
   }
-}
-
-## centering and scaling numeric variables (DESeq2 suggestion)
-
-for(var_ in var.batch.num){
-  pheno[,var_] <- scale(pheno[,var_])[,1]
 }
 
 ########################################################################
@@ -122,14 +119,22 @@ if(all(outliers != "")){
   #paste("Is count and phenotype data are matched?",ifelse(identical(colnames(counts) , rownames(pheno)),"Yes","NO"))
 }
 
-
-
-for (var_ in var.batch.fact) {
-  pheno[,var_] <- as.factor(pheno[,var_])
+var.all = var.trait
+pheno[,var.trait] <- as.factor(pheno[,var.trait])
+if(length(var.batch.fact) > 0){
+  for (var_ in var.batch.fact) {
+    pheno[,var_] <- as.factor(pheno[,var_])
+  }
+  var.all = c(var.all , var.batch.fact)
 }
 
-for (var_ in var.batch.num) {
-  pheno[,var_] <- as.numeric(pheno[,var_])
+if(length(var.batch.num) > 0){
+  for (var_ in var.batch.num) {
+    pheno[,var_] <- as.numeric(pheno[,var_])
+    ## centering and scaling numeric variables (DESeq2 suggestion)
+    pheno[,var_] <- scale(pheno[,var_])[,1]
+  }
+  var.all = c(var.all , var.batch.num)
 }
 
 ########################################################################
@@ -138,11 +143,11 @@ for (var_ in var.batch.num) {
 #
 ########################################################################
 OutPrefix = paste0(OutPrefix , ".DESeq2")
-var.batch.all <- c(var.batch.fact , var.batch.num)
+
 if(n.SV > 0){
   message("Calculating sorrogate variables...")
   mod0 <- model.matrix(~1,data=pheno)
-  design.sva <- as.formula(paste0("~",var.trait,"+",paste(var.batch.all , collapse = "+")))
+  design.sva <- as.formula(paste0("~",var.trait,"+",paste(var.all , collapse = "+")))
   message("SVA model:\n",design.sva)
   mod1 <- model.matrix(design.sva , data = pheno)
   
@@ -159,7 +164,7 @@ if(n.SV > 0){
     n.SV = ncol(svs)
   }
   
-  var.batch.all <- c(var.batch.all , paste0("SV", c(1:n.SV)))
+  var.all <- c(var.all , paste0("SV", c(1:n.SV)))
   
   OutPrefix = paste0(OutPrefix , ".SV",n.SV)
 }
@@ -173,12 +178,12 @@ if(n.PC > 0){
   PCs <- as.data.frame(scale(PCs))
   pheno <- cbind.data.frame(pheno , PCs)
   
-  var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.PC)))
+  var.all <- c(var.all , paste0("PC", c(1:n.PC)))
   
   OutPrefix = paste0(OutPrefix , ".PC",n.PC)
 }
 
-dds.DEG <- DEG.DESeq2(count.data = counts , phenotype.data = pheno,trait = var.trait , batches = var.batch.all)
+dds.DEG <- DEG.DESeq2(count.data = counts , phenotype.data = pheno,variables = var.all)
 
 groups <- unique(pheno[,var.trait])
 contrasts_  <- t(combn(groups, 2))
