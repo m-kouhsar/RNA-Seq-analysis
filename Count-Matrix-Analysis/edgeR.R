@@ -4,7 +4,13 @@ suppressMessages(suppressWarnings(library(edgeR)))
 suppressMessages(suppressWarnings(library(stringr)))
 suppressMessages(suppressWarnings(library(sva)))
 set.seed(12345)
-
+########################################################################
+calculate_lambda <- function(pvals) {
+  pvals <- pvals[!is.na(pvals) & pvals > 0 & pvals < 1]
+  chisq <- qchisq(1 - pvals, df = 1)
+  lambda <- median(chisq) / qchisq(0.5, df = 1)
+  return(lambda)
+}
 ########################################################################
 #
 #          Input parameters
@@ -143,9 +149,9 @@ if(n.PC > 0){
   PCs <- as.data.frame(scale(PCs))
   pheno <- cbind.data.frame(pheno , PCs)
   
-  var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.SV)))
+  var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.PC)))
   
-  OutPrefix = paste0(OutPrefix , ".PC",n.SV)
+  OutPrefix = paste0(OutPrefix , ".PC",n.PC)
 }
 
 message("Running DEG analysis using glmFit function in edgeR...")
@@ -183,5 +189,6 @@ for (i in 1:nrow(contrasts_)){
   result$adjPvalue.bnf <- p.adjust(result$PValue , method = "bonferroni")
   result <- result[order(result$PValue, decreasing = F),]
   result <- cbind.data.frame(Gene = rownames(result) , result)
+  message("The inflation index of the results (Lambda) is ",calculate_lambda(result$PValue))
   write.csv(result , file = paste0(out_name , ".csv"), row.names = F)
 }

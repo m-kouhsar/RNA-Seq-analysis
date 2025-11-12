@@ -4,7 +4,13 @@ suppressMessages(suppressWarnings(library(edgeR)))
 suppressMessages(suppressWarnings(library(stringr)))
 suppressMessages(suppressWarnings(library(sva)))
 set.seed(12345)
-
+########################################################################
+calculate_lambda <- function(pvals) {
+  pvals <- pvals[!is.na(pvals) & pvals > 0 & pvals < 1]
+  chisq <- qchisq(1 - pvals, df = 1)
+  lambda <- median(chisq) / qchisq(0.5, df = 1)
+  return(lambda)
+}
 ####################################################################################################
 DEG.DESeq2 <- function(count.data , phenotype.data , trait , batches){
   
@@ -164,9 +170,9 @@ if(n.PC > 0){
   PCs <- as.data.frame(scale(PCs))
   pheno <- cbind.data.frame(pheno , PCs)
   
-  var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.SV)))
+  var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.PC)))
   
-  OutPrefix = paste0(OutPrefix , ".PC",n.SV)
+  OutPrefix = paste0(OutPrefix , ".PC",n.PC)
 }
 
 dds.DEG <- DEG.DESeq2(count.data = counts , phenotype.data = pheno,trait = var.trait , batches = var.batch.all)
@@ -186,5 +192,6 @@ for (i in 1:nrow(contrasts_)){
   result.table$adjPvalue.bnf <- p.adjust(result.table$PValue , method = "bonferroni")
   result.table <- result.table[order(result.table$PValue, decreasing = F),]
   result.table <- cbind.data.frame(Gene=rownames(result.table) , result.table)
+  message("The inflation index of the results (Lambda) is ",calculate_lambda(result.table$PValue))
   write.csv(result.table , file = paste0(out_name , ".csv") , row.names = F)
 }
