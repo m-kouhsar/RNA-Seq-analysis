@@ -130,7 +130,7 @@ if(n.SV > 0){
   }
   
   var.batch.all <- c(var.batch.all , paste0("SV", c(1:n.SV)))
-  
+  head(pheno)
   OutPrefix = paste0(OutPrefix , ".SV",n.SV)
   
 }
@@ -145,7 +145,7 @@ if(n.PC > 0){
   pheno <- cbind.data.frame(pheno , PCs)
   
   var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.SV)))
-  
+  head(pheno)
   OutPrefix = paste0(OutPrefix , ".PC",n.SV)
 }
 
