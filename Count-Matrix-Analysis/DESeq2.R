@@ -145,10 +145,13 @@ if(n.SV > 0){
   design.sva <- as.formula(paste0("~",var.trait,"+",paste(var.batch.all , collapse = "+")))
   message("SVA model:\n",design.sva)
   mod1 <- model.matrix(design.sva , data = pheno)
+  
   counts.norm <- edgeR::cpm(counts , log = T)
   svs = sva(dat = as.matrix(counts.norm),mod = mod1 , mod0 = mod0)$sv
   
+  cat("\n")
   colnames(svs) <- paste0("SV", c(1:ncol(svs)))
+  print(head(svs))
   
   pheno <- cbind.data.frame(pheno , svs)
   

@@ -120,16 +120,24 @@ for (var_ in var.batch.num) {
 
 OutPrefix <- paste0(OutPrefix , ".limma")
 var.batch.all <- c(var.batch.fact , var.batch.num)
+for (var_ in var.batch.fact) {
+  message("Variable: ", var_)
+  message("Number of unique levels: ", length(unique(pheno[, var_])))
+  print(table(pheno[, var_]))
+}
 if(n.SV > 0){
   message("Calculating sorrogate variables...")
   mod0 <- model.matrix(~1,data=pheno)
   design.sva <- as.formula(paste0("~",var.trait,"+",paste(var.batch.all , collapse = "+")))
   message("SVA model:\n",design.sva)
   mod1 <- model.matrix(design.sva , data = pheno)
+  
   counts.norm <- edgeR::cpm(counts , log = T)
   svs = sva(dat = as.matrix(counts.norm),mod = mod1 , mod0 = mod0)$sv
   
+  cat("\n")
   colnames(svs) <- paste0("SV", c(1:ncol(svs)))
+  print(head(svs))
   
   pheno <- cbind.data.frame(pheno , svs)
   
@@ -140,7 +148,6 @@ if(n.SV > 0){
   var.batch.all <- c(var.batch.all , paste0("SV", c(1:n.SV)))
   
   OutPrefix = paste0(OutPrefix , ".SV",n.SV)
-  
 }
 
 if(n.PC > 0){
