@@ -130,7 +130,7 @@ if(n.SV > 0){
   }
   
   var.batch.all <- c(var.batch.all , paste0("SV", c(1:n.SV)))
-  head(pheno)
+  
   OutPrefix = paste0(OutPrefix , ".SV",n.SV)
   
 }
@@ -139,13 +139,13 @@ if(n.PC > 0){
   message("Calculate the Principal Components...")
   counts.norm <- edgeR::cpm(counts , log = T)
   
-  pca <- prcomp(t(tpm.norm), rank. = PCs)
+  pca <- prcomp(t(counts.norm), rank. = n.PC)
   PCs <- pca$x
   PCs <- as.data.frame(scale(PCs))
   pheno <- cbind.data.frame(pheno , PCs)
   
   var.batch.all <- c(var.batch.all , paste0("PC", c(1:n.SV)))
-  head(pheno)
+  
   OutPrefix = paste0(OutPrefix , ".PC",n.SV)
 }
 
