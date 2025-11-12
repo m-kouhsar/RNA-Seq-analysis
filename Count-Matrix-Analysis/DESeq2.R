@@ -204,6 +204,17 @@ for (i in 1:nrow(contrasts_)){
   result.table$adjPvalue.bnf <- p.adjust(result.table$PValue , method = "bonferroni")
   result.table <- result.table[order(result.table$PValue, decreasing = F),]
   result.table <- cbind.data.frame(Gene=rownames(result.table) , result.table)
-  message("The inflation index of the results (Lambda) is ",calculate_lambda(result.table$PValue))
+  
+  inflation = calculate_lambda(result.table$PValue)
+  message("The inflation index of the results (Lambda) is ", inflation)
+  
+  pdf(file = paste0(out_name , ".QQ.pdf") , height = 8 , width = 8)
+  qq(result.table$PValue, main=paste0("QQ Plot - " , paste(contrasts_[i,], collapse = " vs ")))
+  text(x = 0.5,y = (par("usr")[4]-0.2),
+       label = bquote(lambda == .(round(inflation, 2))),
+       adj = c(0, 1),
+       cex = 1)
+  graphics.off()
+  
   write.csv(result.table , file = paste0(out_name , ".csv") , row.names = F)
 }

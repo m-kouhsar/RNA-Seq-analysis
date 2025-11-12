@@ -4,6 +4,7 @@ suppressMessages(suppressWarnings(library(edgeR)))
 suppressMessages(suppressWarnings(library(limma)))
 suppressMessages(suppressWarnings(library(stringr)))
 suppressMessages(suppressWarnings(library(sva)))
+suppressMessages(suppressWarnings(library(qqman)))
 set.seed(12345)
 
 ########################################################################
@@ -208,6 +209,17 @@ for (i in 1:nrow(contrasts_)){
   result$adjPvalue.bnf <- p.adjust(result$PValue , method = "bonferroni")
   result <- result[order(result$PValue, decreasing = F),]
   result <- cbind.data.frame(Gene = rownames(result) , result)
-  message("The inflation index of the results (Lambda) is ",calculate_lambda(result$PValue))
+  
+  inflation = calculate_lambda(result$PValue)
+  message("The inflation index of the results (Lambda) is ", inflation)
+  
+  pdf(file = paste0(out_name , ".QQ.pdf") , height = 8 , width = 8)
+  qq(result$PValue, main=paste0("QQ Plot - " , paste(contrasts_[i,], collapse = " vs ")))
+  text(x = 0.5,y = (par("usr")[4]-0.2),
+       label = bquote(lambda == .(round(inflation, 2))),
+       adj = c(0, 1),
+       cex = 1)
+  graphics.off()
+  
   write.csv(result , file = paste0(out_name , ".csv"), row.names = F)
 }
