@@ -211,7 +211,7 @@ for (i in 1:nrow(contrasts_)){
   result <- cbind.data.frame(Gene = rownames(result) , result)
   
   inflation = calculate_lambda(result$PValue)
-  message("The inflation index of the results (Lambda) is ", inflation)
+  message("The inflation index of the results (",paste(contrasts_[i,], collapse = " vs "),") is ", inflation)
   
   pdf(file = paste0(out_name , ".QQ.pdf") , height = 8 , width = 8)
   qq(result$PValue, main=paste0("QQ Plot - " , paste(contrasts_[i,], collapse = " vs ")))
