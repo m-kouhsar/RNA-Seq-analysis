@@ -146,18 +146,20 @@ if(n.SV > 0){
   svs = sva(dat = as.matrix(counts.norm),mod = mod1 , mod0 = mod0)$sv
   
   cat("\n")
-  colnames(svs) <- paste0("SV", c(1:ncol(svs)))
-  print(head(svs))
-  
-  pheno <- cbind.data.frame(pheno , svs)
-  
-  if(ncol(svs) < n.SV){
-    n.SV = ncol(svs)
+  if(ncol(svs) > 0){ #If any SVs found
+    colnames(svs) <- paste0("SV", c(1:ncol(svs)))
+    print(head(svs))
+    
+    pheno <- cbind.data.frame(pheno , svs)
+    
+    if(ncol(svs) < n.SV){
+      n.SV = ncol(svs)
+    }
+    
+    var.all <- c(var.all , paste0("SV", c(1:n.SV)))
+    
+    OutPrefix = paste0(OutPrefix , ".SV",n.SV) 
   }
-  
-  var.all <- c(var.all , paste0("SV", c(1:n.SV)))
-  
-  OutPrefix = paste0(OutPrefix , ".SV",n.SV)
 }
 
 if(n.PC > 0){
