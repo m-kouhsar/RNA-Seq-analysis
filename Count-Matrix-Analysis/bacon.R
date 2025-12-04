@@ -62,7 +62,7 @@ graphics.off()
 
 sumstat$bacon_adjPval.BH <- p.adjust(sumstat$bacon_pval_corrected , method = "BH")
 sumstat$bacon_adjPval.bnf <- p.adjust(sumstat$bacon_pval_corrected , method = "bonferroni")
-write.csv(sumstat , file = paste0(OutPrefix , ".bacon.csv") )
+write.csv(sumstat , file = paste0(OutPrefix , ".bacon.csv") , row.names = F)
 
 
 
