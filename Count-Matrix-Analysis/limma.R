@@ -181,6 +181,9 @@ message("Running DEG analysis using voom and lmfit functions in limma...")
 design.formula = as.formula(paste0("~0+",paste(var.all , collapse = "+")))
 message("Linea regression model:\n",design.formula)
 
+message("Groups destribution:")
+print(table(pheno[,var.trait]))
+
 design.matrix = model.matrix(design.formula , data = pheno)
 groups <- levels(as.factor(pheno[,var.trait]))
 colnames(design.matrix)[1:length(groups)] <- groups
