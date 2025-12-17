@@ -178,8 +178,8 @@ graphics.off()
 #
 ########################################################################
 message("filtering low count genes...")
-message("Genes that don't have minimum count of ",gFilter.min.count, " in at least ",(gFilter.min.prop*100) , "% of the samples will be removed.")
-keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = 5, min.prop = 0.75)
+message("Genes that do not have a minimum count of ",gFilter.min.count, " in at least ",(gFilter.min.prop*100) , "% of samples in the smallest group will be removed.")
+keep <- edgeR::filterByExpr(counts,group = pheno[,var.trait],min.count = gFilter.min.count, min.prop = gFilter.min.prop)
 message(sum(!keep),"/",nrow(counts)," genes removed. Remaining genes:", sum(keep))
 counts <- counts[keep,]
 
