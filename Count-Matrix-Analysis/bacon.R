@@ -38,8 +38,15 @@ sumstat <- sumstat[!is.na(sumstat[,standarderrors_col]),]
 message("Applying bacon...")
 bc_obj = bacon(effectsizes = sumstat[,effectsizes_col] , standarderrors = sumstat[,standarderrors_col])
 
-sumstat$bacon_test_stat_corrected = as.numeric(bacon::tstat(bc_obj , corrected = T))
 sumstat$bacon_test_stat_uncorrected = as.numeric(bacon::tstat(bc_obj , corrected = F))
+sumstat$bacon_test_stat_corrected = as.numeric(bacon::tstat(bc_obj , corrected = T))
+
+sumstat$bacon_SE_uncorrected = as.numeric(bacon::se(bc_obj , corrected = F))
+sumstat$bacon_SE_corrected = as.numeric(bacon::se(bc_obj , corrected = T))
+
+sumstat$bacon_effect_sizes_uncorrected = as.numeric(bacon::es(bc_obj , corrected = F))
+sumstat$bacon_effect_sizes_corrected = as.numeric(bacon::es(bc_obj , corrected = T))
+
 sumstat$bacon_pval_uncorrected = as.numeric(bacon::pval(bc_obj , corrected = F))
 sumstat$bacon_pval_corrected = as.numeric(bacon::pval(bc_obj , corrected = T))
 
