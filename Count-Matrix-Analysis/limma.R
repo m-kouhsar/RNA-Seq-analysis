@@ -72,6 +72,7 @@ outliers <- trimws(str_split_1(outliers , pattern = ","))
 if(!identical(colnames(counts) , rownames(pheno))){
   warning("Row names in Phenotype data are not matched with column names in count data. Shared IDs will be considered.")
   index <- intersect(rownames(pheno) , colnames(counts))
+  message("Number of shared Sample IDs: ",length(index))
   if(length(index)<2){
     stop("Phenotype data and counts data cannot be matched!")
   }else{
