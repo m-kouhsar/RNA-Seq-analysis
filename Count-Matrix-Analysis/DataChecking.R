@@ -137,6 +137,9 @@ if(!identical(colnames(counts) , rownames(pheno))){
   message("Warning message:\nColnames in the count matrix are not equal to the rownames in the phenotype file!\nShared names will be considered.")
   index <- intersect(colnames(counts), rownames(pheno))
   message("Number of shared names: " , length(index))
+  if(length(index) < 1){
+    stop("There is no shared ID between Phneotype and Count data!")
+  }
   counts <- counts[,index]
   pheno <- pheno[index , ]
 }
