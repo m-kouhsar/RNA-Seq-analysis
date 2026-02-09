@@ -134,7 +134,11 @@ counts <- read.table(file = counts.file, stringsAsFactors = F,header = T, row.na
 pheno <- read.csv(pheno.file , row.names = 1 , stringsAsFactors = F)
 
 if(!identical(colnames(counts) , rownames(pheno))){
-  stop("Colnames in the count matrix are not equal to the rownames in the phenotype file!")
+  warning("Colnames in the count matrix are not equal to the rownames in the phenotype file!\nShared names will be considered.")
+  index <- intersect(colnames(counts), rownames(pheno))
+  message("Number of shared names: " , length(index))
+  counts <- counts[,index]
+  pheno <- pheno[index , ]
 }
 
 var.fact <- trimws(str_split_1(var.fact , pattern = ","))
