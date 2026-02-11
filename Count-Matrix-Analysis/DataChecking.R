@@ -234,6 +234,7 @@ colnames(cor_) <- all_var
 rownames(cor_) <- colnames(PCs)[1:10]
 
 cor_pval <- cor_
+impact_val <- cor_
 
 for (i in 1:10) {
   for (j in 1:length(all_var)) {
@@ -243,22 +244,28 @@ for (i in 1:10) {
       res1<-cor.test(as.numeric(PCs[,i]),as.numeric(as.factor(pheno[,var_])), method="spearman",exact = FALSE)
       cor_[i,var_]<-as.numeric(res1$estimate)
       cor_pval[i,var_]<-as.numeric(res1$p.value)
+      if(cor_pval[i,var_] < 0.05){
+        impact_val[i , var_] <- cor_[i,var_]**2 * PC.PVar[i]
+      }else{
+        impact_val[i , var_] = 0
+      }
+      
     }else{
       res1<-cor.test(as.numeric(PCs[,i]),as.numeric(pheno[,var_]), method="pearson",exact = FALSE)
       cor_[i,var_]<-as.numeric(res1$estimate)
       cor_pval[i,var_]<-as.numeric(res1$p.value)
+      
+      if(cor_pval[i,var_] < 0.05){
+        impact_val[i , var_] <- cor_[i,var_]**2 * PC.PVar[i]
+      }else{
+        impact_val[i , var_] = 0
+      }
     }
   }
 }
 
-textMatrix = paste(signif(cor_, 2), "\n(",signif(cor_pval, 1), ")", sep = "")
-dim(textMatrix) = dim(cor_)
-
-PCA.mahal <- mahalanobis.outlier(Data = counts.norm , method = "pca" , plot.title = "Outliers by Mahalanobis Distance")
-plot_data$mdist <- PCA.mahal$Data.2D$mdist
-plot_data$pchisq <- PCA.mahal$Data.2D$pchisq
-plot_data$qchisq <- PCA.mahal$Data.2D$qchisq
-plot_data$Outliers.Mahalanobis <- PCA.mahal$Data.2D$Outlier
+textMatrix_cor = paste(signif(cor_, 2), "\n(",signif(cor_pval, 1), ")", sep = "")
+dim(textMatrix_cor) = dim(cor_)
 
 pdf(file = paste0(OutPrefix , ".PCA.pdf"),width = 10,height = 10)
 par(mar = c(12, 8,3, 3))
@@ -268,11 +275,34 @@ labeledHeatmap(Matrix = cor_,
                ySymbols = rownames(cor_),
                colorLabels = FALSE,
                colors = blueWhiteRed(50),
-               textMatrix = textMatrix,
+               textMatrix = textMatrix_cor,
                setStdMargins = FALSE,
                cex.text = 0.5,
                zlim = c(-1,1),
-               main = paste("PCA Analysis"))
+               main = "PCA Analysis (Correlation and P-value)")
+
+textMatrix_imp = signif(impact_val, 2)
+dim(textMatrix_imp) = dim(cor_)
+
+par(mar = c(12, 8,3, 3))
+labeledHeatmap(Matrix = cor_,
+               xLabels = colnames(cor_),
+               yLabels = paste0(rownames(cor_),"(",PC.PVar[1:10],"%)"),
+               ySymbols = rownames(cor_),
+               colorLabels = FALSE,
+               colors = blueWhiteRed(50),
+               textMatrix = textMatrix_imp,
+               setStdMargins = FALSE,
+               cex.text = 0.8,
+               zlim = c(-1,1),
+               main = expression("Significant PC Correlations" ~ (Impact ~ value == r^2 %*% "%Var"[PC])))
+
+
+PCA.mahal <- mahalanobis.outlier(Data = counts.norm , method = "pca" , plot.title = "Outliers by Mahalanobis Distance")
+plot_data$mdist <- PCA.mahal$Data.2D$mdist
+plot_data$pchisq <- PCA.mahal$Data.2D$pchisq
+plot_data$qchisq <- PCA.mahal$Data.2D$qchisq
+plot_data$Outliers.Mahalanobis <- PCA.mahal$Data.2D$Outlier
 
 print(PCA.mahal$Plot.2D)
 print(PCA.mahal$Plot.QQ)
