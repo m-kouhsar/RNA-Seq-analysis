@@ -25,6 +25,6 @@ OutPrefix="Results/NIH"
 ScriptDir="/lustre/projects/Research_Project-191391/Morteza/github/RNA-Seq-analysis/Count-Matrix-Analysis"
 ##########################################################################
 
-Rscript $ScriptDir/DataChecking.R $counts_file $pheno_file $trait_var $factor_vars $numeric_vars $normalize_method $lib_size_threshold $gFilter_min_count $gFilter_min_prop $OutPrefix
+Rscript $ScriptDir/DataChecking.R $ScriptDir $counts_file $pheno_file $trait_var $factor_vars $numeric_vars $normalize_method $lib_size_threshold $gFilter_min_count $gFilter_min_prop $OutPrefix
 
 echo "All done!"
