@@ -42,7 +42,7 @@ var.batch.fact <- args[5]
 outliers <- args[6]
 gFilter.min.count <- as.numeric(trimws(args[7]))
 gFilter.min.prop <- as.numeric(trimws(args[8]))
-n.SV <- as.numeric(trimws(args[9]))
+n.SV <- tolower(trimws(args[9]))
 n.PC <- as.numeric(trimws(args[10]))
 OutPrefix <- trimws(args[11])
 
@@ -148,7 +148,7 @@ if(length(var.batch.num) > 0){
 ########################################################################
 OutPrefix = paste0(OutPrefix , ".DESeq2")
 
-if(n.SV > 0){
+if(n.SV == "all" | (as.numeric(n.SV) > 0)){
   message("Calculating sorrogate variables...")
   mod0 <- model.matrix(as.formula(paste0("~",paste(c(var.batch.num,var.batch.fact),collapse = "+"))),data=pheno)
   design.sva <- as.formula(paste0("~",paste(var.all , collapse = "+")))
