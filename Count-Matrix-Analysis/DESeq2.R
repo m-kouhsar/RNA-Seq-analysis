@@ -150,10 +150,11 @@ OutPrefix = paste0(OutPrefix , ".DESeq2")
 
 if(n.SV == "all" | (as.numeric(n.SV) > 0)){
   message("Calculating sorrogate variables...")
-  mod0 <- model.matrix(as.formula(paste0("~",paste(c(var.batch.num,var.batch.fact),collapse = "+"))),data=pheno)
-  design.sva <- as.formula(paste0("~",paste(var.all , collapse = "+")))
-  message("SVA mod0:\n",mod0 , "\nSVA main model:\n",design.sva)
-  mod1 <- model.matrix(design.sva , data = pheno)
+  mod0.formula <- as.formula(paste0("~",paste(c(var.batch.num,var.batch.fact),collapse = "+")))
+  mod0 <- model.matrix(mod0.formula,data=pheno)
+  mod1.formula <- as.formula(paste0("~",paste(var.all , collapse = "+")))
+  message("SVA mod0:\n",mod0.formula , "\nSVA main model:\n",mod1.formula)
+  mod1 <- model.matrix(mod1.formula , data = pheno)
   
   counts.norm <- edgeR::cpm(counts , log = T)
   svs = sva(dat = as.matrix(counts.norm),mod = mod1 , mod0 = mod0)$sv
