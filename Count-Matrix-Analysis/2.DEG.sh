@@ -21,7 +21,7 @@ factor_batch="Sex"
 outliers="SampleID1,SampleID2"
 gFilter_min_count=5
 gFilter_min_prop=0.75
-nSV=4
+nSV="all"
 nPC=0
 OutPrefix="./Results/Ascribed"
 
