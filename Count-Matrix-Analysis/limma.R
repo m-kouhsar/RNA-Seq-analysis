@@ -139,9 +139,9 @@ OutPrefix <- paste0(OutPrefix , ".limma")
 
 if(n.SV > 0){
   message("Calculating sorrogate variables...")
-  mod0 <- model.matrix(~1,data=pheno)
+  mod0 <- model.matrix(as.formula(paste0("~",paste(c(var.batch.num,var.batch.fact),collapse = "+"))),data=pheno)
   design.sva <- as.formula(paste0("~",paste(var.all , collapse = "+")))
-  message("SVA model:\n",design.sva)
+  message("SVA mod0:\n",mod0 , "\nSVA main model:\n",design.sva)
   mod1 <- model.matrix(design.sva , data = pheno)
   
   counts.norm <- edgeR::cpm(counts , log = T)
