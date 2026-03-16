@@ -26,12 +26,13 @@ args = commandArgs(T)
 counts.file <- trimws(args[1])
 pheno.file <- trimws(args[2])
 var.trait <- trimws(args[3])
-var.batch.num <- args[4]
-var.batch.fact <- args[5]
-outliers <- args[6]
+var.batch.num <- trimws(args[4])
+var.batch.fact <- trimws(args[5])
+outliers <- trimws(args[6])
 gFilter.min.count <- as.numeric(trimws(args[7]))
 gFilter.min.prop <- as.numeric(trimws(args[8]))
 n.SV <- tolower(trimws(args[9]))
+#n.UV <- tolower(trimws(args[9])) # Number of W detected bu RUVr in RUV-Seq package
 n.PC <- as.numeric(trimws(args[10]))
 OutPrefix <- trimws(args[11])
 
@@ -82,18 +83,6 @@ if(!identical(colnames(counts) , rownames(pheno))){
   }
 }
 
-
-########################################################################
-#
-#          Filtering low counts
-#
-########################################################################
-message("filtering low count genes...")
-message("Genes that don't have minimum count of ",gFilter.min.count, " in at least ",(gFilter.min.prop*100) , "% of the samples will be removed.")
-keep <- edgeR::filterByExpr(round(counts),group = pheno[,var.trait],min.count = gFilter.min.count, min.prop = gFilter.min.prop)
-message(sum(!keep),"/",nrow(counts)," genes removed. Remaining genes:", sum(keep))
-counts <- counts[keep,]
-
 ########################################################################
 #
 #          Removing outlier samples
@@ -128,6 +117,17 @@ if(length(var.batch.num) > 0){
   var.all = c(var.all , var.batch.num)
 }
 
+
+########################################################################
+#
+#          Filtering low counts
+#
+########################################################################
+message("filtering low count genes...")
+message("Genes that don't have minimum count of ",gFilter.min.count, " in at least ",(gFilter.min.prop*100) , "% of the samples will be removed.")
+keep <- edgeR::filterByExpr(round(counts),group = pheno[,var.trait],min.count = gFilter.min.count, min.prop = gFilter.min.prop)
+message(sum(!keep),"/",nrow(counts)," genes removed. Remaining genes:", sum(keep))
+counts <- counts[keep,]
 
 ########################################################################
 #
