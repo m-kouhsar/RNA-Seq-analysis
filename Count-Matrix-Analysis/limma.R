@@ -1,20 +1,3 @@
-message("loading requireed libraries...")
-suppressMessages(suppressWarnings(library(DESeq2)))
-suppressMessages(suppressWarnings(library(edgeR)))
-suppressMessages(suppressWarnings(library(limma)))
-suppressMessages(suppressWarnings(library(stringr)))
-suppressMessages(suppressWarnings(library(sva)))
-suppressMessages(suppressWarnings(library(qqman)))
-set.seed(12345)
-
-########################################################################
-calculate_lambda <- function(pvals) {
-  pvals <- pvals[!is.na(pvals) & pvals > 0 & pvals < 1]
-  chisq <- qchisq(1 - pvals, df = 1)
-  lambda <- median(chisq) / qchisq(0.5, df = 1)
-  return(lambda)
-}
-
 ########################################################################
 #
 #          Input parameters
@@ -51,6 +34,23 @@ message("        Number of Principal Components added to the model: ",n.PC)
 message("        Output files prefix: ",OutPrefix)
 cat("##########################################################################\n")
 
+message("loading requireed libraries...")
+suppressMessages(suppressWarnings(library(DESeq2)))
+suppressMessages(suppressWarnings(library(edgeR)))
+suppressMessages(suppressWarnings(library(limma)))
+suppressMessages(suppressWarnings(library(stringr)))
+suppressMessages(suppressWarnings(library(sva)))
+suppressMessages(suppressWarnings(library(qqman)))
+set.seed(12345)
+
+########################################################################
+calculate_lambda <- function(pvals) {
+  pvals <- pvals[!is.na(pvals) & pvals > 0 & pvals < 1]
+  chisq <- qchisq(1 - pvals, df = 1)
+  lambda <- median(chisq) / qchisq(0.5, df = 1)
+  return(lambda)
+}
+
 ########################################################################
 #
 #          Reading the data
@@ -82,6 +82,17 @@ if(!identical(colnames(counts) , rownames(pheno))){
     counts <- counts[, index]
   }
 }
+
+########################################################################
+#
+#          Filtering low counts
+#
+########################################################################
+message("filtering low count genes...")
+message("Genes that don't have minimum count of ",gFilter.min.count, " in at least ",(gFilter.min.prop*100) , "% of the samples will be removed.")
+keep <- edgeR::filterByExpr(round(counts),group = pheno[,var.trait],min.count = gFilter.min.count, min.prop = gFilter.min.prop)
+message(sum(!keep),"/",nrow(counts)," genes removed. Remaining genes:", sum(keep))
+counts <- counts[keep,]
 
 ########################################################################
 #
@@ -117,18 +128,6 @@ if(length(var.batch.num) > 0){
   var.all = c(var.all , var.batch.num)
 }
 
-
-########################################################################
-#
-#          Filtering low counts
-#
-########################################################################
-message("filtering low count genes...")
-message("Genes that don't have minimum count of ",gFilter.min.count, " in at least ",(gFilter.min.prop*100) , "% of the samples will be removed.")
-keep <- edgeR::filterByExpr(round(counts),group = pheno[,var.trait],min.count = gFilter.min.count, min.prop = gFilter.min.prop)
-message(sum(!keep),"/",nrow(counts)," genes removed. Remaining genes:", sum(keep))
-counts <- counts[keep,]
-
 ########################################################################
 #
 #          DEG analysis
@@ -142,8 +141,8 @@ if(n.SV == "all" | (as.numeric(n.SV) > 0)){
   mod0.formula <- as.formula(paste0("~",paste(c(var.batch.num,var.batch.fact),collapse = "+")))
   mod0 <- model.matrix(mod0.formula,data=pheno)
   mod1.formula <- as.formula(paste0("~",paste(var.all , collapse = "+")))
-  message("SVA mod0:\n",mod0.formula , "\nSVA main model:\n",mod1.formula)
   mod1 <- model.matrix(mod1.formula , data = pheno)
+  message("SVA mod0:\n",mod0.formula , "\nSVA main model:\n",mod1.formula)
   
   counts.norm <- edgeR::cpm(counts , log = T)
   svs = sva(dat = as.matrix(counts.norm),mod = mod1 , mod0 = mod0)$sv
