@@ -72,7 +72,7 @@ var.batch.fact <- var.batch.fact[nchar(var.batch.fact) > 0]
 outliers <- trimws(str_split_1(outliers , pattern = ","))
 
 if(!identical(colnames(counts) , rownames(pheno))){
-  warning("Row names in Phenotype data are not matched with column names in count data. Shared IDs will be considered.")
+  message("Warning: Row names in Phenotype data are not matched with column names in count data. Shared IDs will be considered.")
   index <- intersect(rownames(pheno) , colnames(counts))
   message("Number of shared Sample IDs: ",length(index))
   if(length(index)<2){
