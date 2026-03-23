@@ -1,14 +1,3 @@
-message("Loading requiered packages...")
-library(bacon)
-library(qqman)
-############################################################
-calculate_lambda <- function(pvals) {
-  pvals <- pvals[!is.na(pvals) & pvals > 0 & pvals < 1]
-  chisq <- qchisq(1 - pvals, df = 1)
-  lambda <- median(chisq) / qchisq(0.5, df = 1)
-  return(lambda)
-}
-##########################################################
 args <- commandArgs(T)
 sumstat_file <- trimws(args[1])
 effectsizes_col <- trimws(args[2])
@@ -22,6 +11,19 @@ message("        Standar Errors column: ",standarderrors_col)
 message("        Output files Prefix: ",OutPrefix)
 
 ############################################################
+
+message("Loading requiered packages...")
+library(bacon)
+library(qqman)
+############################################################
+calculate_lambda <- function(pvals) {
+  pvals <- pvals[!is.na(pvals) & pvals > 0 & pvals < 1]
+  chisq <- qchisq(1 - pvals, df = 1)
+  lambda <- median(chisq) / qchisq(0.5, df = 1)
+  return(lambda)
+}
+##########################################################
+
 message("Reading input data...")
 
 sumstat <- read.csv(sumstat_file , stringsAsFactors = F , check.names = F)
