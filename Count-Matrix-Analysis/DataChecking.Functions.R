@@ -8,7 +8,7 @@ suppressWarnings(suppressMessages(library(ggcorrplot)))
 suppressWarnings(suppressMessages(library(reshape2)))
 
 ########################################################################
-mahalanobis.outlier <- function(Data , method = "pca", plot.title=NA , tsne.seed = NA, pca.scale=T , pca.center=T){
+mahalanobis.outlier <- function(Data , method = "pca", plot.title=NA , tsne.seed = NA, pca.scale=F , pca.center=T){
   
   suppressMessages(library(car))
   suppressMessages(library(dplyr))
