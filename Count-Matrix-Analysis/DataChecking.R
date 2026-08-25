@@ -229,8 +229,28 @@ message("Hirarchical clustering...")
 distance <- dist(t(counts.norm) , method = "euclidean")
 hc = hclust(distance, method = "average")
 
+labelCol <- rep("black" , times = ncol(counts.norm))
+labelCol[plot_data$Outliers.Mahalanobis == "Yes"] = "orange"
+labelCol[plot_data$Outliers.PC.ZScore] = "coral"
+labelCol[plot_data$Outliers.PC.ZScore & (plot_data$Outliers.Mahalanobis == "Yes")] = "red"
+
+label.size = 0.7
+title.size = 1.5
+
+suppressWarnings(suppressMessages(library(dendextend)))
+
+hc <-  hc %>% as.dendrogram %>% hang.dendrogram %>%
+  set("labels_colors",labelCol, order_value = TRUE) %>% 
+  set("leaves_col",labelCol, order_value = TRUE) %>% 
+  set("labels_cex", label.size) 
+
+
 pdf(file = paste0(OutPrefix , ".hClust.pdf"),width = 18,height = 10)
 plot(hc,xlab = "", sub = "",cex=0.5)
+legend("topright",
+       legend = c("Mahalanobis", "PC Z-score", "Both"),
+       col = c("orange", "pink", "red"),
+       title = "Otliers",pch = c(16, 16))
 graphics.off()
 
 #################################################
