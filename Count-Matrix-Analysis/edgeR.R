@@ -186,11 +186,16 @@ colnames(design.matrix)[1:length(groups)] <- groups
 
 dge.list <- DGEList(counts = counts,samples = pheno , group = pheno[,var.trait])
 
-dge.list <- calcNormFactors(dge.list)
+dge.list <- calcNormFactors(dge.list, method="TMM")
 
 dge.list <- estimateDisp(dge.list , design = design.matrix , robust = T)
 
-fit <- edgeR::glmFit(dge.list , design = design.matrix)
+#fit <- edgeR::glmFit(dge.list , design = design.matrix)
+fit <- glmQLFit(
+  dge.list,
+  design = design.matrix,
+  robust = TRUE
+)
 
 contrasts_  <- t(combn(groups, 2))
 
@@ -198,14 +203,18 @@ for (i in 1:nrow(contrasts_)){
   
   out_name = paste0(OutPrefix,".",paste(contrasts_[i,], collapse = "."))
   
-  lrt <- edgeR::glmLRT(fit, contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix))
-  result = topTags(lrt,adjust.method = "BH" ,n = nrow(dge.list))
+  #lrt <- edgeR::glmLRT(fit, contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix))
+  #result = topTags(lrt,adjust.method = "BH" ,n = nrow(dge.list))
+  
+  qlf <- edgeR::glmQLFTest(fit , contrast = makeContrasts(contrasts = paste(contrasts_[i,] , collapse = "-") , levels = design.matrix))
+  result = topTags(qlf,adjust.method = "BH" ,n = nrow(dge.list))
   result = result$table
+  
   if(is.null(result)){
     result = as.data.frame(matrix(data = NA , nrow = 1 , ncol = 5))
   }
   
-  colnames(result) = c("logFC" , "logCPM", "LR"   ,  "PValue" ,"adjPValue.BH")
+  colnames(result) = c("logFC" , "logCPM", "F"   ,  "PValue" ,"adjPValue.BH")
   result$adjPvalue.bnf <- p.adjust(result$PValue , method = "bonferroni")
   result <- result[order(result$PValue, decreasing = F),]
   result <- cbind.data.frame(Gene = rownames(result) , result)
