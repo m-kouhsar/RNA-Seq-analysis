@@ -165,7 +165,7 @@ if(n.SV == "all" | (as.numeric(n.SV) > 0)){
   
   pheno <- cbind.data.frame(pheno , svs)
   
-  if(ncol(svs) < n.SV){
+  if((ncol(svs) < as.numeric(n.SV)) | (n.SV == "all")){
     n.SV = ncol(svs)
   }
   
@@ -190,7 +190,7 @@ if(n.PC > 0){
 
 dds.DEG <- DEG.DESeq2(count.data = counts , phenotype.data = pheno,variables = var.all)
 
-groups <- unique(as.character(pheno[,var.trait]))
+groups <- levels(as.factor(pheno[,var.trait]))
 contrasts_  <- t(combn(groups, 2))
 
 dir.create(path = dirname(OutPrefix),showWarnings = F,recursive = T)
